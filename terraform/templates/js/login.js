@@ -1,9 +1,9 @@
 import { getPoolData, login } from './function.js';
-        const apiUrlSecrets = 'https://vj8nf8d3sl.execute-api.us-east-1.amazonaws.com/v1/get_secret';
+import config  from './config.js';
     
         (async function() {
             try {
-                const data = await getPoolData(apiUrlSecrets);
+                const data = await getPoolData(config.apiUrlSecrets);
                 if (!data.body) {
                     throw new Error("No se obtuvieron los datos del pool");
                 }

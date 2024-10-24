@@ -1,11 +1,10 @@
 import { getPoolData, waitForPoolData,fetchMatches,logout,placeBet } from './function.js';
-
-const apiUrlSecrets = 'https://vj8nf8d3sl.execute-api.us-east-1.amazonaws.com/v1/get_secret';
+import config  from './config.js';
 
 window.poolDataUrl = null;
 (async function() {
     try {
-        const data = await getPoolData(apiUrlSecrets);
+        const data = await getPoolData(config.apiUrlSecrets);
         const parsedBody = JSON.parse(data.body);
 
         if (parsedBody.UrlApiManageMatches && parsedBody.UrlApiPutBets) {
