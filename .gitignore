@@ -1,0 +1,8 @@
+#Ignorar config.js
+terraform/templates/js/config.js
+
+#Ignorar archivos de terraform
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
