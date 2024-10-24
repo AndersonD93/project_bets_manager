@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realizar Apuesta</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+<div class="bet-container">
+    <h2>Realizar Apuesta</h2>
+    <select id="match_select">
+        <option value="" disabled selected>Seleccione un partido</option>
+        <!-- Opciones serán cargadas dinámicamente -->
+    </select>
+
+    <!-- Selección del resultado del partido -->
+    <select id="bet_result" required>
+        <option value="">Seleccione el resultado</option>
+        <option value="home_win">Gana equipo local</option>
+        <option value="away_win">Gana equipo visitante</option>
+        <option value="draw">Empate</option>
+    </select>
+
+    <!-- Inputs para los goles exactos -->
+    <div>
+        <label for="local_goals">Goles Local:</label>
+        <input type="number" id="local_goals" placeholder="Goles Local" min="0" required>
+    </div>
+    <div>
+        <label for="away_goals">Goles Visitante:</label>
+        <input type="number" id="away_goals" placeholder="Goles Visitante" min="0" required>
+    </div>
+
+    <button id="place-bet-button" class="button-blue">Realizar Apuesta</button>
+    <button class="update-results-btn button-green" onclick="window.location.href='score.html'">Ver Puntajes</button>
+    <button class="update-results-btn button-red" id="logout-button">Logout</button>
+</div>
+
+<script type="module" src="../js/bets.js"></script>
+</body>
+</html>

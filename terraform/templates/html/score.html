@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puntajes - Sports</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+
+<body>
+
+    <h2>Puntajes del Torneo</h2>
+
+    <div class="container">
+        <table id="scores-table">
+            <thead>
+                <tr>
+                    <th>#</th> <!-- Cabecera para el orden -->
+                    <th>Usuario</th>
+                    <th>Puntaje Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Las filas se llenarán dinámicamente aquí -->
+            </tbody>
+        </table>
+        <button class="update-results-btn button-red" id="logout-button">Logout</button>
+        <button class="update-results-btn button-green" onclick="window.location.href='bets.html'">Realizar Apuestas</button>
+
+    </div>
+
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.953.0.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@5.1.0/dist/amazon-cognito-identity.min.js"></script>
+        <script type="module" src="../js/score.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrar Partidos</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <div class="admin-container">
+        <h2>Crear Partidos Manualmente</h2>
+        <input type="text" id="match_id" placeholder="ID del Partido" required>
+        <input type="text" id="teams" placeholder="Equipos (ej. Team A vs Team B)" required>
+        <input type="datetime-local" id="match_date" required>
+        <button class="update-results-btn button-green" id="creat-match-button">Crear Partido</button>
+
+        <!-- Botón para navegar a la página de actualización de resultados -->
+        <button class="update-results-btn button-blue" onclick="window.location.href='results.html'">Ir a Actualizar Resultados</button>
+        <button class="update-results-btn button-red" id="logout-button">Logout</button>
+    </div>
+
+    <script type="module" src="../js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sports Admin</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="data:,">
+</head>
+<body>
+    <div class="login-container" id="login-container">
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button id="login-button">Login</button>
+    </div>
+
+    <div class="after-login-container hidden" id="after-login-container">
+        <h2>Bienvenido</h2>
+        <p>¿Qué te gustaría hacer?</p>
+        <div id="admin-options" class="hidden">
+            <button onclick="window.location.href='html/admin.html'">Crear Partidos</button>
+            <button onclick="window.location.href='html/results.html'">Actualizar Resultados</button>
+            <button onclick="window.location.href='html/matches.html'">Cargar Partidos Por Competición</button>
+        </div>
+        <div id="general-options" class="hidden">
+            <button onclick="window.location.href='html/score.html'">Ver Puntajes</button>
+            <button onclick="window.location.href='html/bets.html'">Realizar Apuestas</button>
+        </div>
+    </div>
+
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.953.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@5.1.0/dist/amazon-cognito-identity.min.js"></script>
+    <script type="module" src="js/login.js"></script>
+</body>
+</html>

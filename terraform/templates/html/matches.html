@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Football Matches</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+
+<body>
+    <h1>Load Football Matches</h1>
+
+    <form id="matchesForm">
+        <label for="competition_id">Selecciona una competencia:</label>
+        <select id="competition_id" name="competition_id" required>
+            <option value="WC">FIFA World Cup</option>
+            <option value="CL">UEFA Champions League</option>
+            <option value="BL1">Bundesliga</option>
+            <option value="DED">Eredivisie</option>
+            <option value="BSA">Campeonato Brasileiro Série A</option>
+            <option value="PD">Primera Division</option>
+            <option value="FL1">Ligue 1</option>
+            <option value="ELC">Championship</option>
+            <option value="PPL">Primeira Liga</option>
+            <option value="EC">European Championship</option>
+            <option value="SA">Serie A</option>
+            <option value="PL">Premier League</option>
+            <option value="CLI">Copa Libertadores</option>
+        </select>
+
+        <label for="matchday">Fecha No. (Matchday):</label>
+        <input type="number" id="matchday" name="matchday" required>
+
+        <button type="submit" class="update-results-btn button-green">Load Matches</button>
+
+        <button onclick="window.location.href='admin.html'" class="update-results-btn button-blue">Crear Partidos</button>
+        <button onclick="window.location.href='results.html'" class="update-results-btn button-blue">Actualizar Resultados</button>
+    </form>
+
+    <script type="module" src="../js/matches.js"></script>
+</body>
+
+</html>
