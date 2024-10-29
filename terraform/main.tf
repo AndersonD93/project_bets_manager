@@ -16,7 +16,7 @@ provider "aws" {
   region = "us-east-1"
 }
 
-#LAMBDAS
+
 module "resources" {
   source = "./modules/resources"
 
@@ -25,11 +25,13 @@ module "resources" {
   dynamo_tables_list_name = local.dynamo_tables_list_name
 }
 
+
 module "tf-state" {
   source      = "./modules/tf-state"
   bucket_name = "cc-tf-state-backend-ci-cd-ajduran"
 }
 
+#LAMBDAS
 module "update_results" {
   source = "./modules/resources/lambda"
   lambda_name           = "update_results"
@@ -245,6 +247,9 @@ module "score_user_table" {
 resource "aws_api_gateway_rest_api" "api_bets_manager" {
   name        = "api_bets_manager_IAC"
   description = "API for bets manager"
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
 }
 
 resource "aws_api_gateway_authorizer" "cognito_authorizer" {
@@ -377,3 +382,134 @@ resource "aws_api_gateway_deployment" "api_deployment_put_bets" {
     aws_api_gateway_integration.bets_options_integration,
   ]
 }
+
+# Crear el método Options en /get_secret 
+
+resource "aws_api_gateway_resource" "get_secret" {
+  rest_api_id = aws_api_gateway_rest_api.api_bets_manager.id
+  parent_id   = aws_api_gateway_rest_api.api_bets_manager.root_resource_id
+  path_part   = "get_secret"
+}
+
+resource "aws_api_gateway_method" "get_secret_options" {
+  rest_api_id   = aws_api_gateway_rest_api.api_bets_manager.id
+  resource_id   = aws_api_gateway_resource.get_secret.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+  
+}
+
+resource "aws_api_gateway_integration" "get_secret_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.api_bets_manager.id
+  resource_id             = aws_api_gateway_resource.get_secret.id
+  http_method             = aws_api_gateway_method.get_secret_options.http_method
+  integration_http_method = "OPTIONS"
+  type                    = "MOCK"
+
+  request_templates = {
+    "application/json" = "{\"statusCode\": 200}"
+  }
+
+  passthrough_behavior = "WHEN_NO_MATCH"
+}
+
+resource "aws_api_gateway_method_response" "get_secret_response" {
+  rest_api_id = aws_api_gateway_rest_api.api_bets_manager.id
+  resource_id = aws_api_gateway_resource.get_secret.id
+  http_method = aws_api_gateway_method.get_secret_options.http_method
+  status_code = "200"
+
+  response_models = {
+    "application/json" = "Empty"
+  }
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Headers" = true
+  }
+}
+
+resource "aws_api_gateway_integration_response" "get_secret_options_integration_response" {
+  rest_api_id  = aws_api_gateway_rest_api.api_bets_manager.id
+  resource_id  = aws_api_gateway_resource.get_secret.id
+  http_method  = aws_api_gateway_method.get_secret_options.http_method
+  status_code  = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+    "method.response.header.Access-Control-Allow-Methods" = "'GET,POST,OPTIONS'"
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+  }
+  depends_on = [
+    aws_api_gateway_integration.bets_options_integration
+  ]
+}
+
+# Crear el método GET en /get_secret 
+
+resource "aws_api_gateway_method" "get_secret_get" {
+  rest_api_id   = aws_api_gateway_rest_api.api_bets_manager.id
+  resource_id   = aws_api_gateway_resource.get_secret.id
+  http_method   = "GET"
+  authorization = "NONE"
+  
+}
+
+resource "aws_api_gateway_integration" "get_secret_get_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.api_bets_manager.id
+  resource_id             = aws_api_gateway_resource.get_secret.id
+  http_method             = aws_api_gateway_method.get_secret_get.http_method
+  integration_http_method = "GET"
+  type                    = "AWS"
+  uri                     = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${module.get_secret.lambda_arn}/invocations"
+
+  depends_on = [
+    aws_api_gateway_method.get_secret_get
+  ]
+}
+
+resource "aws_api_gateway_method_response" "get_secret_get_response" {
+  rest_api_id = aws_api_gateway_rest_api.api_bets_manager.id
+  resource_id = aws_api_gateway_resource.get_secret.id
+  http_method = aws_api_gateway_method.get_secret_get.http_method
+  status_code = "200"
+
+  response_models = {
+    "application/json" = "Empty"
+  }
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Headers" = true
+  }
+}
+
+resource "aws_api_gateway_integration_response" "get_secret_get_integration_response" {
+  rest_api_id  = aws_api_gateway_rest_api.api_bets_manager.id
+  resource_id  = aws_api_gateway_resource.get_secret.id
+  http_method  = aws_api_gateway_method.get_secret_get.http_method
+  status_code  = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = "'${module.resources.s3_bucket_website_url}'"
+  }
+
+  response_templates = {
+    "application/json" = <<EOF
+      #set($inputRoot = $input.path('$'))
+      {
+        "message": "$inputRoot.message",
+        "data": $input.json('$')
+      }
+    EOF
+  }
+
+  depends_on = [
+    aws_api_gateway_integration.get_secret_get_integration,
+    module.get_secret.lambda_permission_api
+  ]
+}
+
+

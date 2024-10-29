@@ -17,7 +17,7 @@ export function login(userPool) {
 
     cognitoUser.authenticateUser(authenticationDetails, {
         onSuccess: function (result) {
-            alert('Login exitoso');
+            alert('Login exitoso...');
             const idToken = result.getIdToken().getJwtToken();
             const idTokenPayload = result.getIdToken().decodePayload();
             const userGroups = idTokenPayload['cognito:groups'];
