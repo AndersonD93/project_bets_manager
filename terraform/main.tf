@@ -244,6 +244,31 @@ module "score_user_table" {
 }
 #API GATEWAY
 
+module "api_bets_manager"{   
+  source            = "./modules/resources/api_gateway"
+  name_api          = "api_bets_manager_moduls"
+  description_api   = "api para gestionar peticiones para backends logica de aplicación"
+  type_endpoint     = "REGIONAL"
+}
+
+module "api_resource_put_bets"{
+  source                 = "./modules/resources/api_gateway/api_resources"
+  api_id                 = module.api_bets_manager.api_id
+  api_root_resource_id   = module.api_bets_manager.api_root_resource_id
+  path_part              = "put_bets"
+  http_method            = "OPTIONS"
+  authorization          = "NONE"
+  type_integration       = "MOCK"
+  request_templates      = {
+    "application/json" = "{\"statusCode\": 200}"
+  }
+  passthrough_behavior   = "WHEN_NO_MATCH"
+  response_models        = {
+    "application/json" = "Empty"
+  }
+  stage_name             = "prod"
+}
+
 resource "aws_api_gateway_rest_api" "api_bets_manager" {
   name        = "api_bets_manager_IAC"
   description = "API for bets manager"
