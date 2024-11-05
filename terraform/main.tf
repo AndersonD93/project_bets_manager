@@ -249,25 +249,47 @@ module "api_bets_manager"{
   name_api          = "api_bets_manager_moduls"
   description_api   = "api para gestionar peticiones para backends logica de aplicación"
   type_endpoint     = "REGIONAL"
+  path_part_list    = ["put_bets","get_secret","manage_matches","create-matches-football-data","update_results"] 
 }
 
-module "api_resource_put_bets"{
-  source                 = "./modules/resources/api_gateway/api_resources"
-  api_id                 = module.api_bets_manager.api_id
-  api_root_resource_id   = module.api_bets_manager.api_root_resource_id
-  path_part              = "put_bets"
-  http_method            = "OPTIONS"
-  authorization          = "NONE"
-  type_integration       = "MOCK"
-  request_templates      = {
-    "application/json" = "{\"statusCode\": 200}"
-  }
-  passthrough_behavior   = "WHEN_NO_MATCH"
-  response_models        = {
-    "application/json" = "Empty"
-  }
-  stage_name             = "prod"
+resource "aws_api_gateway_authorizer" "cognito_authorizer_module" {
+  name                    = "CognitoAuthorizerModule"
+  rest_api_id             = module.api_bets_manager.api_id
+  identity_source         = "method.request.header.Authorization"
+  type                    = "COGNITO_USER_POOLS"
+  provider_arns           = ["arn:aws:cognito-idp:us-east-1:122610499801:userpool/us-east-1_TpdDqGK9s"]
+  #provider_arns           = [aws_cognito_user_pool.my_user_pool.arn]
 }
+
+module "api_resource_put_bets" {
+  source               = "./modules/resources/api_gateway/api_resources"
+  api_id               = module.api_bets_manager.api_id
+  api_root_resource_id = module.api_bets_manager.api_root_resource_id
+
+  api_resources = {
+    "put_bets_options" = {
+      resource_id          = module.api_bets_manager.api_resource_ids["put_bets"]
+      http_method          = "OPTIONS"
+      authorization        = "NONE"
+      type_integration     = "MOCK"
+      request_templates    = { "application/json" = "{\"statusCode\": 200}" }
+      passthrough_behavior = "WHEN_NO_MATCH"
+      response_models      = { "application/json" = "Empty" }
+      stage_name           = "prd"
+    },
+    "put_bets_put" = {
+      resource_id          = module.api_bets_manager.api_resource_ids["put_bets"]
+      http_method          = "POST"
+      authorization        = "COGNITO_USER_POOLS"
+      authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer_module.id
+      type_integration     = "AWS"
+      uri                  = module.put_bets.lambda_arn
+      response_models      = { "application/json" = "Empty" }
+      stage_name           = "prd"
+    }
+  }
+}
+
 
 resource "aws_api_gateway_rest_api" "api_bets_manager" {
   name        = "api_bets_manager_IAC"

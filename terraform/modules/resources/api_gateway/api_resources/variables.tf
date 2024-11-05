@@ -6,14 +6,6 @@ variable "api_root_resource_id" {
   type = string
 }
 
-variable "path_part" {  
-  type = string  
-}
-
-variable "http_method" {
-  type = string
-}
-
 variable "authorization" {
   type = string
   default = "NONE"
@@ -32,11 +24,7 @@ variable "type_integration"{
   }
 }
 
-variable "request_templates" {
-  description = "Plantillas de solicitud para la API"
-  type        = map(string)
-}
-
+/*
 variable "passthrough_behavior" {
   description = "Comportamiento de paso a través de la integración"
   type = string
@@ -46,12 +34,36 @@ variable "passthrough_behavior" {
     error_message = "passthrough_behavior es obligatorio si se proporcionan request_templates."
   }
 }
+*/
 
-variable "response_models" {
-  description = "Un mapa que especifica los recursos del modelo utilizados para el tipo de contenido de la respuesta"
-  type        = map(string)
+variable "uri" {
+  description = "URI de la integración"
+  type        = string
+  default     = null
+  validation {
+    condition = var.uri == null && var.type_integration != "MOCK"
+    error_message = "uri es obligatorio cuando type_integration no es MOCK."
+  }
 }
 
-variable "stage_name"{
-    type = string
+variable "api_resources" {
+  description = "Mapa de recursos del api gateway"
+
+  type = map(object({
+    resource_id          = string,
+    http_method          = string,
+    authorization        = string,
+    authorizer_id        = optional(string)
+    type_integration     = string,
+    uri                  = optional(string)
+    request_templates    = optional(map(string)),
+    passthrough_behavior = optional(string),
+    response_models      = optional(map(string)),
+    stage_name           = string
+    })
+  )
+}
+
+variable "region" {
+  default = "us-east-1"
 }

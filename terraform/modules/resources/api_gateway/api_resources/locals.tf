@@ -1,5 +1,14 @@
-# Recurso adicional para response_models, si se necesita
 locals {
-  response_models   = var.response_models != {} ? var.response_models : {}
-  request_templates = var.request_templates != {} ? var.request_templates : {}
+  response_models = {
+    for key, resource in var.api_resources :
+    key => (resource.response_models != {} ? resource.response_models : {})
+  }
+
+  request_templates = {
+    for key, resource in var.api_resources :
+    key => (resource.request_templates != {} ? resource.request_templates : {})
+  }
+
+  uri = var.uri != null ? var.uri : null
+
 }

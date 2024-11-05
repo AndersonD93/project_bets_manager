@@ -16,3 +16,8 @@ variable "type_endpoint" {
         error_message = "Los valores aceptados son EDGE, REGIONAL, PRIVATE"
     }   
 }
+
+variable "path_part_list" {
+  type = set(string)
+}
+
