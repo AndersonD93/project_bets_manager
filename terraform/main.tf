@@ -31,6 +31,190 @@ module "tf-state" {
   bucket_name = "cc-tf-state-backend-ci-cd-ajduran"
 }
 
+#API GATEWAY
+
+module "api_bets_manager"{   
+  source            = "./modules/resources/api_gateway"
+  name_api          = "api_bets_manager_moduls"
+  description_api   = "api para gestionar peticiones para backends logica de aplicación"
+  type_endpoint     = "REGIONAL"
+  path_part_list    = ["put_bets","get_secret","manage_matches","create-matches-football-data","update_results"] 
+}
+
+resource "aws_api_gateway_authorizer" "cognito_authorizer_module" {
+  name                    = "CognitoAuthorizerModule"
+  rest_api_id             = module.api_bets_manager.api_id
+  identity_source         = "method.request.header.Authorization"
+  type                    = "COGNITO_USER_POOLS"
+  provider_arns           = ["arn:aws:cognito-idp:us-east-1:122610499801:userpool/us-east-1_TpdDqGK9s"]
+  #provider_arns           = [aws_cognito_user_pool.my_user_pool.arn]
+}
+
+module "api_resource_put_bets" {
+  source               = "./modules/resources/api_gateway/api_resources"
+  api_id               = module.api_bets_manager.api_id
+  api_root_resource_id = module.api_bets_manager.api_root_resource_id
+
+  api_resources = {
+    "put_bets_options" = {
+      resource_id          = module.api_bets_manager.api_resource_ids["put_bets"]
+      http_method          = "OPTIONS"
+      authorization        = "NONE"
+      type_integration     = "MOCK"
+      request_templates    = { "application/json" = "{\"statusCode\": 200}" }
+      passthrough_behavior = "WHEN_NO_MATCH"
+      response_models      = { "application/json" = "Empty" }
+      stage_name           = "prd"
+    },
+    "put_bets_put" = {
+      resource_id          = module.api_bets_manager.api_resource_ids["put_bets"]
+      http_method          = "POST"
+      authorization        = "COGNITO_USER_POOLS"
+      authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer_module.id
+      type_integration     = "AWS"
+      uri                  = module.put_bets.lambda_arn
+      response_models      = { "application/json" = "Empty" }
+      stage_name           = "prd"
+    }
+  }
+}
+
+module "api_resource_get_secret" {
+  source               = "./modules/resources/api_gateway/api_resources"
+  api_id               = module.api_bets_manager.api_id
+  api_root_resource_id = module.api_bets_manager.api_root_resource_id
+
+  api_resources = {
+    "manage_matches_options" = {
+      resource_id          = module.api_bets_manager.api_resource_ids["get_secret"]
+      http_method          = "OPTIONS"
+      authorization        = "NONE"
+      type_integration     = "MOCK"
+      request_templates    = { "application/json" = "{\"statusCode\": 200}" }
+      passthrough_behavior = "WHEN_NO_MATCH"
+      response_models      = { "application/json" = "Empty" }
+      stage_name           = "prd"
+    },
+    "manage_matches_get" = {
+      resource_id          = module.api_bets_manager.api_resource_ids["get_secret"]
+      http_method          = "GET"
+      authorization        = "COGNITO_USER_POOLS"
+      authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer_module.id
+      type_integration     = "AWS"
+      uri                  = module.get_secret.lambda_arn
+      response_models      = { "application/json" = "Empty" }
+      stage_name           = "prd"
+    }
+  }
+}
+
+module "api_resource_manage_matches" {
+  source               = "./modules/resources/api_gateway/api_resources"
+  api_id               = module.api_bets_manager.api_id
+  api_root_resource_id = module.api_bets_manager.api_root_resource_id
+
+  api_resources = {
+    "manage_matches_options" = {
+      resource_id          = module.api_bets_manager.api_resource_ids["manage_matches"]
+      http_method          = "OPTIONS"
+      authorization        = "NONE"
+      type_integration     = "MOCK"
+      request_templates    = { "application/json" = "{\"statusCode\": 200}" }
+      passthrough_behavior = "WHEN_NO_MATCH"
+      response_models      = { "application/json" = "Empty" }
+      stage_name           = "prd"
+    },
+    "manage_matches_post" = {
+      resource_id          = module.api_bets_manager.api_resource_ids["manage_matches"]
+      http_method          = "POST"
+      authorization        = "COGNITO_USER_POOLS"
+      authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer_module.id
+      type_integration     = "AWS"
+      uri                  = module.manage_matches.lambda_arn
+      response_models      = { "application/json" = "Empty" }
+      stage_name           = "prd"
+    },
+    "manage_matches_get" = {
+      resource_id          = module.api_bets_manager.api_resource_ids["manage_matches"]
+      http_method          = "GET"
+      authorization        = "COGNITO_USER_POOLS"
+      authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer_module.id
+      type_integration     = "AWS"
+      uri                  = module.manage_matches.lambda_arn
+      response_models      = { "application/json" = "Empty" }
+      stage_name           = "prd"
+    }
+  }
+}
+
+module "api_resource_create_update_results" {
+  source               = "./modules/resources/api_gateway/api_resources"
+  api_id               = module.api_bets_manager.api_id
+  api_root_resource_id = module.api_bets_manager.api_root_resource_id
+
+  api_resources = {
+    "create_matches_football_data_options" = {
+      resource_id          = module.api_bets_manager.api_resource_ids["create-matches-football-data"]
+      http_method          = "OPTIONS"
+      authorization        = "NONE"
+      type_integration     = "MOCK"
+      request_templates    = { "application/json" = "{\"statusCode\": 200}" }
+      passthrough_behavior = "WHEN_NO_MATCH"
+      response_models      = { "application/json" = "Empty" }
+      stage_name           = "prd"
+    },
+    "create_matches_football_data_post" = {
+      resource_id          = module.api_bets_manager.api_resource_ids["create-matches-football-data"]
+      http_method          = "POST"
+      authorization        = "COGNITO_USER_POOLS"
+      authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer_module.id
+      type_integration     = "AWS"
+      uri                  = module.create_matches_for_futbol_data.lambda_arn
+      response_models      = { "application/json" = "Empty" }
+      stage_name           = "prd"
+    }
+  }
+}
+
+module "api_resource_update_results" {
+  source               = "./modules/resources/api_gateway/api_resources"
+  api_id               = module.api_bets_manager.api_id
+  api_root_resource_id = module.api_bets_manager.api_root_resource_id
+
+  api_resources = {
+    "update_results_options" = {
+      resource_id          = module.api_bets_manager.api_resource_ids["update_results"]
+      http_method          = "OPTIONS"
+      authorization        = "NONE"
+      type_integration     = "MOCK"
+      request_templates    = { "application/json" = "{\"statusCode\": 200}" }
+      passthrough_behavior = "WHEN_NO_MATCH"
+      response_models      = { "application/json" = "Empty" }
+      stage_name           = "prd"
+    },
+    "update_results_post" = {
+      resource_id          = module.api_bets_manager.api_resource_ids["update_results"]
+      http_method          = "POST"
+      authorization        = "COGNITO_USER_POOLS"
+      authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer_module.id
+      type_integration     = "AWS"
+      uri                  = module.update_results.lambda_arn
+      response_models      = { "application/json" = "Empty" }
+      stage_name           = "prd"
+    },
+    "update_results_get" = {
+      resource_id          = module.api_bets_manager.api_resource_ids["update_results"]
+      http_method          = "GET"
+      authorization        = "COGNITO_USER_POOLS"
+      authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer_module.id
+      type_integration     = "AWS"
+      uri                  = module.update_results.lambda_arn
+      response_models      = { "application/json" = "Empty" }
+      stage_name           = "prd"
+    }
+  }
+}
+
 #LAMBDAS
 module "update_results" {
   source = "./modules/resources/lambda"
@@ -120,7 +304,7 @@ module "get_secret" {
   lambda_zip            = "${path.module}/templates/lambdas_code/get_secret.zip"
   handler               = "get_secret.lambda_handler"
   runtime               = "python3.9"
-  source_arn            = "${aws_api_gateway_rest_api.api_bets_manager.execution_arn}/*/*"
+  source_arn            = "${module.api_bets_manager.api_arn}/*/*"
   environment_variables = {
     "secret_name" = "project/appConfig"
   }
@@ -240,53 +424,6 @@ module "score_user_table" {
 
   tags = {
     Project = var.project
-  }
-}
-#API GATEWAY
-
-module "api_bets_manager"{   
-  source            = "./modules/resources/api_gateway"
-  name_api          = "api_bets_manager_moduls"
-  description_api   = "api para gestionar peticiones para backends logica de aplicación"
-  type_endpoint     = "REGIONAL"
-  path_part_list    = ["put_bets","get_secret","manage_matches","create-matches-football-data","update_results"] 
-}
-
-resource "aws_api_gateway_authorizer" "cognito_authorizer_module" {
-  name                    = "CognitoAuthorizerModule"
-  rest_api_id             = module.api_bets_manager.api_id
-  identity_source         = "method.request.header.Authorization"
-  type                    = "COGNITO_USER_POOLS"
-  provider_arns           = ["arn:aws:cognito-idp:us-east-1:122610499801:userpool/us-east-1_TpdDqGK9s"]
-  #provider_arns           = [aws_cognito_user_pool.my_user_pool.arn]
-}
-
-module "api_resource_put_bets" {
-  source               = "./modules/resources/api_gateway/api_resources"
-  api_id               = module.api_bets_manager.api_id
-  api_root_resource_id = module.api_bets_manager.api_root_resource_id
-
-  api_resources = {
-    "put_bets_options" = {
-      resource_id          = module.api_bets_manager.api_resource_ids["put_bets"]
-      http_method          = "OPTIONS"
-      authorization        = "NONE"
-      type_integration     = "MOCK"
-      request_templates    = { "application/json" = "{\"statusCode\": 200}" }
-      passthrough_behavior = "WHEN_NO_MATCH"
-      response_models      = { "application/json" = "Empty" }
-      stage_name           = "prd"
-    },
-    "put_bets_put" = {
-      resource_id          = module.api_bets_manager.api_resource_ids["put_bets"]
-      http_method          = "POST"
-      authorization        = "COGNITO_USER_POOLS"
-      authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer_module.id
-      type_integration     = "AWS"
-      uri                  = module.put_bets.lambda_arn
-      response_models      = { "application/json" = "Empty" }
-      stage_name           = "prd"
-    }
   }
 }
 

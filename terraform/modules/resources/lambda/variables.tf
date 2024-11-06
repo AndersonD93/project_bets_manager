@@ -21,5 +21,7 @@ variable "environment_variables" {
 }
 
 variable "source_arn" {
+  type        = string
   description = "arn para recurso aws_lambda_permission"
 }
+

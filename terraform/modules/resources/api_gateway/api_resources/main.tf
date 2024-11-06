@@ -1,11 +1,19 @@
+resource "aws_api_gateway_request_validator" "request_validator" {
+  for_each                    = var.api_resources
+  name                        = "validator_${each.value.resource_id}_${each.value.http_method}"
+  rest_api_id                 = var.api_id
+  validate_request_body       = true
+  validate_request_parameters = true
+}
 
 resource "aws_api_gateway_method" "api_method" {
-  for_each      = var.api_resources
-  rest_api_id   = var.api_id
-  resource_id   = each.value.resource_id
-  http_method   = each.value.http_method
-  authorization = each.value.authorization
-  authorizer_id = each.value.authorizer_id != null ? each.value.authorizer_id : null
+  for_each             = var.api_resources
+  rest_api_id          = var.api_id
+  resource_id          = each.value.resource_id
+  http_method          = each.value.http_method
+  authorization        = each.value.authorization
+  authorizer_id        = each.value.authorizer_id != null ? each.value.authorizer_id : null
+  request_validator_id = aws_api_gateway_request_validator.request_validator[each.key].id
 }
 
 resource "aws_api_gateway_integration" "api_integration" {
