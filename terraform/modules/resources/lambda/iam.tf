@@ -1,5 +1,6 @@
 resource "aws_iam_role" "lambda_role" {
-  name = "${var.lambda_name}-role"
+  for_each      = var.lambda_map
+  name          = "${each.value.lambda_name}-role-IAC"
 
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
 }
@@ -15,10 +16,11 @@ data "aws_iam_policy_document" "assume_role_policy" {
 }
 
 resource "aws_iam_policy" "lambda_policy" {
-  name        = "${var.lambda_name}-policy"
-  description = "Policy for Lambda ${var.lambda_name}"
+  for_each      = var.lambda_map
+  name          = "${each.value.lambda_name}-policy"
+  description   = "Policy for Lambda ${each.value.lambda_name}"
 
-  policy = data.aws_iam_policy_document.lambda_policy.json
+  policy        = data.aws_iam_policy_document.lambda_policy.json
 }
 
 data "aws_iam_policy_document" "lambda_policy" {
@@ -65,6 +67,7 @@ data "aws_iam_policy_document" "lambda_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_policy_attachment" {
-  role       = aws_iam_role.lambda_role.name
-  policy_arn = aws_iam_policy.lambda_policy.arn
+  for_each   = var.lambda_map
+  role       = aws_iam_role.lambda_role[each.key].name
+  policy_arn = aws_iam_policy.lambda_policy[each.key].arn
 }
