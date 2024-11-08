@@ -1,22 +1,7 @@
 variable "project" {
   default = "bets-manager"
 }
-
-variable "table_name" {
-  description = "Nombre de la tabla DynamoDB"
-  type        = string
-}
-
-variable "hash_key" {
-  description = "Clave hash de la tabla DynamoDB"
-  type        = string
-}
-
-variable "range_key" {
-  description = "Clave de rango de la tabla DynamoDB"
-  type        = string
-}
-
+/*
 variable "attributes" {
   description = "Lista de atributos de la tabla, incluyendo nombre y tipo"
   type = list(object({
@@ -34,26 +19,21 @@ variable "global_secondary_index" {
   })
   default = null  # Permite que sea opcional
 }
+*/
 
-variable "tags" {
-  description = "Etiquetas para la tabla"
-  type        = map(string)
-  default     = {}
-}
+variable "dynamo_tables" {
+  description = "Lista de tablas de dynamo"
 
-variable "roles_lambda_principals" {
-  description = "Lista de ARNs de los roles de Lambdas que tienen acceso a la tabla"
-  type        = list(string)
-}
-
-variable "stream_enabled" {
-  description = "Habilitar o no el stream en la tabla DynamoDB"
-  type        = bool
-  default     = false
-}
-
-variable "stream_view_type" {
-  description = "Tipo de vista del stream en la tabla DynamoDB (opcional)"
-  type        = string
-  default     = null
+  type = map(object({
+    table_name              = string,
+    hash_key                = string,
+    range_key               = string,
+    attributes              = list(map(string)),
+    roles_lambda_principals = list(string),
+    stream_enabled          = optional(bool),
+    stream_view_type        = optional(string),
+    global_secondary_index  = optional(map(string)),
+    tags                    = optional(map(string))
+    })
+  )
 }

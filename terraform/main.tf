@@ -225,8 +225,8 @@ module "lambdas_backend_api" {
       runtime               = "python3.12"
       source_arn            = "${module.api_bets_manager.api_arn}/*/*"
       environment_variables = {
-        "results_table" = module.results_table.dynamo_table_name
-        "matches_table" = module.matches_table.dynamo_table_name
+        #"results_table" = module.dynamo_tables_bets_manager.dynamo_table_name["results_table"]
+        #"matches_table" = module.dynamo_tables_bets_manager.dynamo_table_name["matches_table"]
       }
     },
     "manage_matches" = {
@@ -236,7 +236,7 @@ module "lambdas_backend_api" {
       runtime               = "python3.12"
       source_arn            = "${module.api_bets_manager.api_arn}/*/*"
       environment_variables = {
-        "matches_table" = module.matches_table.dynamo_table_name
+        #"matches_table" = module.dynamo_tables_bets_manager.dynamo_table_name["matches_table"]
       }
     },
     "create_matches_for_futbol_data" = {
@@ -246,7 +246,7 @@ module "lambdas_backend_api" {
       runtime               = "python3.12"
       source_arn            = "${module.api_bets_manager.api_arn}/*/*"
       environment_variables = {
-        "matches_table" = module.matches_table.dynamo_table_name
+        #"matches_table" = module.dynamo_tables_bets_manager.dynamo_table_name["matches_table"]
       }
     },
     "get_secret" = {
@@ -266,7 +266,7 @@ module "lambdas_backend_api" {
       runtime               = "python3.12"
       source_arn            = "${module.api_bets_manager.api_arn}/*/*"
       environment_variables = {
-        "bets_users_table" = module.bets_users_table.dynamo_table_name
+        #"bets_users_table"  = module.dynamo_tables_bets_manager.dynamo_table_name["bets_users_table"]
       }
     },
     recalculate_score = {
@@ -276,9 +276,9 @@ module "lambdas_backend_api" {
       runtime               = "python3.12"
       source_arn            = "${module.api_bets_manager.api_arn}/*/*"
       environment_variables = {
-        "bets_table" = module.bets_users_table.dynamo_table_name
-        "results_table" = module.results_table.dynamo_table_name
-        "score_table" = module.score_user_table.dynamo_table_name
+        #"bets_table"    = module.dynamo_tables_bets_manager.dynamo_table_name["bets_users_table"]
+        #"results_table" = module.dynamo_tables_bets_manager.dynamo_table_name["results_table"]
+        #"score_table"   = module.dynamo_tables_bets_manager.dynamo_table_name["score_user_table"]
       }
     },
     get_matches = {
@@ -288,7 +288,7 @@ module "lambdas_backend_api" {
       runtime               = "python3.12"
       source_arn            = "${module.api_bets_manager.api_arn}/*/*"
       environment_variables = {
-        "matches_table" = module.matches_table.dynamo_table_name
+        #"matches_table" = module.dynamo_tables_bets_manager.dynamo_table_name["matches_table"]
       }
     },
     get_scores = {
@@ -298,14 +298,14 @@ module "lambdas_backend_api" {
       runtime               = "python3.12"
       source_arn            = "${module.api_bets_manager.api_arn}/*/*"
       environment_variables = {
-        "score_user_table" = module.score_user_table.dynamo_table_name
+        #"score_user_table"  = module.dynamo_tables_bets_manager.dynamo_table_name["score_user_table"]
       }
     }
   }
 }
 
 resource "aws_lambda_event_source_mapping" "dynamodb_stream_trigger" {
-  event_source_arn  = module.results_table.dynamo_table_stream_arn
+  event_source_arn  = module.dynamo_tables_bets_manager.dynamo_table_stream_arn
   function_name     = module.lambdas_backend_api.lambda_arns["recalculate_score"]
   enabled           = true
   batch_size        = 100
@@ -314,106 +314,60 @@ resource "aws_lambda_event_source_mapping" "dynamodb_stream_trigger" {
 
 
 #DYNAMO TABLE
-module "bets_users_table" {
-  source             = "./modules/resources/dynamo_table"
-  table_name         = "bets_users"
-  hash_key           = "user_id"
-  range_key          = "match_id"
+module "dynamo_tables_bets_manager" {
+  source = "./modules/resources/dynamo_table"
 
-  attributes = [
-    {
-      name = "user_id"
-      type = "S"
+  dynamo_tables = {
+    score_user_table = {
+      table_name         = "score_user"
+      hash_key           = "user_id"
+      range_key          = "total_score"
+      attributes         = [
+        { name = "user_id", type = "S" },
+        { name = "total_score", type = "N" }
+      ]
+      roles_lambda_principals = [module.lambdas_backend_api.lambda_role_arns["update_results"]]
+      tags                    = { Project = var.project }
     },
-    {
-      name = "match_id"
-      type = "S"
-    }
-  ]
-
-  global_secondary_index = {
-    name            = "MatchIdIndex"
-    hash_key        = "match_id"
-    projection_type = "ALL"
-  }
-
-  roles_lambda_principals = [ module.lambdas_backend_api.lambda_role_arns["update_results"] ]
-
-  tags = {
-    Project = var.project
-  }
-}
-
-module "matches_table" {
-  source             = "./modules/resources/dynamo_table"
-  table_name         = "matches_table"
-  hash_key           = "match_id"
-  range_key          = "status"
-
-  attributes = [
-    {
-      name = "match_id"
-      type = "S"
+    results_table = {
+      table_name         = "results_table"
+      hash_key           = "match_id"
+      range_key          = "extact_score"
+      attributes         = [
+        { name = "match_id", type = "S" },
+        { name = "extact_score", type = "S" }
+      ]
+      stream_enabled     = true
+      stream_view_type   = "NEW_AND_OLD_IMAGES"
+      roles_lambda_principals = [module.lambdas_backend_api.lambda_role_arns["update_results"]]
+      tags                    = { Project = var.project }
     },
-    {
-      name = "status"
-      type = "S"
-    }
-  ]
-
-  roles_lambda_principals = [ module.lambdas_backend_api.lambda_role_arns["update_results"] , module.lambdas_backend_api.lambda_role_arns["create_matches_for_futbol_data"] , module.lambdas_backend_api.lambda_role_arns["get_matches"] ]
-
-  tags = {
-    Project = var.project
-  }
-}
-
-module "results_table" {
-  source             = "./modules/resources/dynamo_table"
-  table_name         = "results_table"
-  hash_key           = "match_id"
-  range_key          = "extact_score"
-
-  attributes = [
-    {
-      name = "match_id"
-      type = "S"
+    matches_table = {
+      table_name         = "matches_table"
+      hash_key           = "match_id"
+      range_key          = "status"
+      attributes         = [
+        { name = "match_id", type = "S" },
+        { name = "status", type = "S" }
+      ]
+      roles_lambda_principals = [module.lambdas_backend_api.lambda_role_arns["update_results"] , module.lambdas_backend_api.lambda_role_arns["create_matches_for_futbol_data"] , module.lambdas_backend_api.lambda_role_arns["get_matches"]]
+      tags                    = { Project = var.project }
     },
-    {
-      name = "extact_score"
-      type = "S"
+    bets_users_table = {
+      table_name         = "bets_users"
+      hash_key           = "user_id"
+      range_key          = "match_id"
+      attributes         = [
+        { name = "user_id", type = "S" },
+        { name = "match_id", type = "S" }
+      ]
+      global_secondary_index = {
+        name            = "MatchIdIndex"
+        hash_key        = "match_id"
+        projection_type = "ALL"
+      }
+      roles_lambda_principals = [module.lambdas_backend_api.lambda_role_arns["update_results"]]
+      tags                    = { Project = var.project }
     }
-  ]
-  stream_enabled    = true
-  stream_view_type  = "NEW_AND_OLD_IMAGES"
-
-  roles_lambda_principals = [ module.lambdas_backend_api.lambda_role_arns["update_results"] ]
-
-  tags = {
-    Project = var.project
-  }
-}
-
-module "score_user_table" {
-  source             = "./modules/resources/dynamo_table"
-  table_name         = "score_user"
-  hash_key           = "user_id"
-  range_key          = "total_score"
-
-  attributes = [
-    {
-      name = "user_id"
-      type = "S"
-    },
-    {
-      name = "total_score"
-      type = "N"
-    }
-  ]
-
-  roles_lambda_principals = [ module.lambdas_backend_api.lambda_role_arns["update_results"] ]
-
-  tags = {
-    Project = var.project
   }
 }
