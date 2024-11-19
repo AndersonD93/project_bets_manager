@@ -10,3 +10,16 @@ output "arn_dynamo_table_stream" {
   value = module.dynamo_tables_bets_manager.dynamo_table_stream_arn
 }
 
+output "dynamo_table_names" {
+  value = module.dynamo_tables_bets_manager.list_table_arn_dynamo
+}
+
+output "lookup_score_user_table" {
+  value = module.dynamo_tables_bets_manager.lookup_score_user_table
+}
+
+output "url_invoke_api" {
+  value = module.api_resource_create_update_results.url_invoke_api["create_matches_football_data_post"]
+}
+
+

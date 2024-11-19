@@ -28,36 +28,4 @@ resource "aws_dynamodb_table" "dynamo_table" {
   tags = each.value.tags != null ? each.value.tags : {}
 }
 
-resource "aws_dynamodb_resource_policy" "dynamo_policy" {
-  for_each     = var.dynamo_tables
-  resource_arn = aws_dynamodb_table.dynamo_table[each.key].arn
-  policy       = data.aws_iam_policy_document.dynamo_table_policy[each.key].json
-}
-
-data "aws_iam_policy_document" "dynamo_table_policy" {
-  for_each     = var.dynamo_tables
-  statement {
-    sid    = "AllowAccessToDynamoTable"
-    effect = "Allow"
-
-    principals {
-      type        = "AWS"
-      identifiers = each.value.roles_lambda_principals
-    }
-
-    actions = [
-      "dynamodb:GetItem",
-      "dynamodb:PutItem",
-      "dynamodb:UpdateItem",
-      "dynamodb:DeleteItem",
-      "dynamodb:Query",
-      "dynamodb:Scan"
-    ]
-
-    resources = [
-      aws_dynamodb_table.dynamo_table[each.key].arn,
-      "${aws_dynamodb_table.dynamo_table[each.key].arn}/index/*"
-    ]
-  }
-}
 

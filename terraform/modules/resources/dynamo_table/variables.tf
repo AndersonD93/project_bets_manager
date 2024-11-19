@@ -29,7 +29,6 @@ variable "dynamo_tables" {
     hash_key                = string,
     range_key               = string,
     attributes              = list(map(string)),
-    roles_lambda_principals = list(string),
     stream_enabled          = optional(bool),
     stream_view_type        = optional(string),
     global_secondary_index  = optional(map(string)),
