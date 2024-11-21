@@ -5,7 +5,7 @@ resource "aws_dynamodb_resource_policy" "dynamo_policy" {
 }
 
 data "aws_iam_policy_document" "dynamo_table_policy" {
-  for_each     = var.mapping_dynamo_permission
+  for_each = var.mapping_dynamo_permission
   statement {
     sid    = "AllowAccessToDynamoTable"
     effect = "Allow"

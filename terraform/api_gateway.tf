@@ -1,19 +1,19 @@
 #API GATEWAY
 
-module "api_bets_manager"{   
-  source            = "./modules/resources/api_gateway"
-  name_api          = "api_bets_manager_moduls"
-  description_api   = "api para gestionar peticiones para backends logica de aplicación"
-  type_endpoint     = "REGIONAL"
-  path_part_list    = ["put_bets","get_secret","manage_matches","create-matches-football-data","update_results"] 
+module "api_bets_manager" {
+  source          = "./modules/resources/api_gateway"
+  name_api        = "api_bets_manager_moduls"
+  description_api = "api para gestionar peticiones para backends logica de aplicación"
+  type_endpoint   = "REGIONAL"
+  path_part_list  = ["put_bets", "get_secret", "manage_matches", "create-matches-football-data", "update_results"]
 }
 
 resource "aws_api_gateway_authorizer" "cognito_authorizer_module" {
-  name                    = "CognitoAuthorizerModule"
-  rest_api_id             = module.api_bets_manager.api_id
-  identity_source         = "method.request.header.Authorization"
-  type                    = "COGNITO_USER_POOLS"
-  provider_arns           = ["arn:aws:cognito-idp:us-east-1:122610499801:userpool/us-east-1_TpdDqGK9s"]
+  name            = "CognitoAuthorizerModule"
+  rest_api_id     = module.api_bets_manager.api_id
+  identity_source = "method.request.header.Authorization"
+  type            = "COGNITO_USER_POOLS"
+  provider_arns   = ["arn:aws:cognito-idp:us-east-1:122610499801:userpool/us-east-1_TpdDqGK9s"]
   #provider_arns           = [aws_cognito_user_pool.my_user_pool.arn]
 }
 
@@ -34,14 +34,14 @@ module "api_resource_put_bets" {
       stage_name           = "prd"
     },
     "put_bets_put" = {
-      resource_id          = module.api_bets_manager.api_resource_ids["put_bets"]
-      http_method          = "POST"
-      authorization        = "COGNITO_USER_POOLS"
-      authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer_module.id
-      type_integration     = "AWS"
-      uri                  = module.lambdas_backend_api.lambda_arns["put_bets"]
-      response_models      = { "application/json" = "Empty" }
-      stage_name           = "prd"
+      resource_id      = module.api_bets_manager.api_resource_ids["put_bets"]
+      http_method      = "POST"
+      authorization    = "COGNITO_USER_POOLS"
+      authorizer_id    = aws_api_gateway_authorizer.cognito_authorizer_module.id
+      type_integration = "AWS"
+      uri              = module.lambdas_backend_api.lambda_arns["put_bets"]
+      response_models  = { "application/json" = "Empty" }
+      stage_name       = "prd"
     }
   }
 }
@@ -63,14 +63,14 @@ module "api_resource_get_secret" {
       stage_name           = "prd"
     },
     "get_secret_get" = {
-      resource_id          = module.api_bets_manager.api_resource_ids["get_secret"]
-      http_method          = "GET"
-      authorization        = "COGNITO_USER_POOLS"
-      authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer_module.id
-      type_integration     = "AWS"
-      uri                  = module.lambdas_backend_api.lambda_arns["get_secret"]
-      response_models      = { "application/json" = "Empty" }
-      stage_name           = "prd"
+      resource_id      = module.api_bets_manager.api_resource_ids["get_secret"]
+      http_method      = "GET"
+      authorization    = "COGNITO_USER_POOLS"
+      authorizer_id    = aws_api_gateway_authorizer.cognito_authorizer_module.id
+      type_integration = "AWS"
+      uri              = module.lambdas_backend_api.lambda_arns["get_secret"]
+      response_models  = { "application/json" = "Empty" }
+      stage_name       = "prd"
     }
   }
 }
@@ -92,24 +92,24 @@ module "api_resource_manage_matches" {
       stage_name           = "prd"
     },
     "manage_matches_post" = {
-      resource_id          = module.api_bets_manager.api_resource_ids["manage_matches"]
-      http_method          = "POST"
-      authorization        = "COGNITO_USER_POOLS"
-      authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer_module.id
-      type_integration     = "AWS"
-      uri                  = module.lambdas_backend_api.lambda_arns["manage_matches"]
-      response_models      = { "application/json" = "Empty" }
-      stage_name           = "prd"
+      resource_id      = module.api_bets_manager.api_resource_ids["manage_matches"]
+      http_method      = "POST"
+      authorization    = "COGNITO_USER_POOLS"
+      authorizer_id    = aws_api_gateway_authorizer.cognito_authorizer_module.id
+      type_integration = "AWS"
+      uri              = module.lambdas_backend_api.lambda_arns["manage_matches"]
+      response_models  = { "application/json" = "Empty" }
+      stage_name       = "prd"
     },
     "manage_matches_get" = {
-      resource_id          = module.api_bets_manager.api_resource_ids["manage_matches"]
-      http_method          = "GET"
-      authorization        = "COGNITO_USER_POOLS"
-      authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer_module.id
-      type_integration     = "AWS"
-      uri                  = module.lambdas_backend_api.lambda_arns["manage_matches"]
-      response_models      = { "application/json" = "Empty" }
-      stage_name           = "prd"
+      resource_id      = module.api_bets_manager.api_resource_ids["manage_matches"]
+      http_method      = "GET"
+      authorization    = "COGNITO_USER_POOLS"
+      authorizer_id    = aws_api_gateway_authorizer.cognito_authorizer_module.id
+      type_integration = "AWS"
+      uri              = module.lambdas_backend_api.lambda_arns["manage_matches"]
+      response_models  = { "application/json" = "Empty" }
+      stage_name       = "prd"
     }
   }
 }
@@ -131,14 +131,14 @@ module "api_resource_create_update_results" {
       stage_name           = "prd"
     },
     "create_matches_football_data_post" = {
-      resource_id          = module.api_bets_manager.api_resource_ids["create-matches-football-data"]
-      http_method          = "POST"
-      authorization        = "COGNITO_USER_POOLS"
-      authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer_module.id
-      type_integration     = "AWS"
-      uri                  = module.lambdas_backend_api.lambda_arns["create_matches_for_futbol_data"]
-      response_models      = { "application/json" = "Empty" }
-      stage_name           = "prd"
+      resource_id      = module.api_bets_manager.api_resource_ids["create-matches-football-data"]
+      http_method      = "POST"
+      authorization    = "COGNITO_USER_POOLS"
+      authorizer_id    = aws_api_gateway_authorizer.cognito_authorizer_module.id
+      type_integration = "AWS"
+      uri              = module.lambdas_backend_api.lambda_arns["create_matches_for_futbol_data"]
+      response_models  = { "application/json" = "Empty" }
+      stage_name       = "prd"
     }
   }
 }
@@ -160,24 +160,24 @@ module "api_resource_update_results" {
       stage_name           = "prd"
     },
     "update_results_post" = {
-      resource_id          = module.api_bets_manager.api_resource_ids["update_results"]
-      http_method          = "POST"
-      authorization        = "COGNITO_USER_POOLS"
-      authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer_module.id
-      type_integration     = "AWS"
-      uri                  = module.lambdas_backend_api.lambda_arns["update_results"]
-      response_models      = { "application/json" = "Empty" }
-      stage_name           = "prd"
+      resource_id      = module.api_bets_manager.api_resource_ids["update_results"]
+      http_method      = "POST"
+      authorization    = "COGNITO_USER_POOLS"
+      authorizer_id    = aws_api_gateway_authorizer.cognito_authorizer_module.id
+      type_integration = "AWS"
+      uri              = module.lambdas_backend_api.lambda_arns["update_results"]
+      response_models  = { "application/json" = "Empty" }
+      stage_name       = "prd"
     },
     "update_results_get" = {
-      resource_id          = module.api_bets_manager.api_resource_ids["update_results"]
-      http_method          = "GET"
-      authorization        = "COGNITO_USER_POOLS"
-      authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer_module.id
-      type_integration     = "AWS"
-      uri                  = module.lambdas_backend_api.lambda_arns["update_results"]
-      response_models      = { "application/json" = "Empty" }
-      stage_name           = "prd"
+      resource_id      = module.api_bets_manager.api_resource_ids["update_results"]
+      http_method      = "GET"
+      authorization    = "COGNITO_USER_POOLS"
+      authorizer_id    = aws_api_gateway_authorizer.cognito_authorizer_module.id
+      type_integration = "AWS"
+      uri              = module.lambdas_backend_api.lambda_arns["update_results"]
+      response_models  = { "application/json" = "Empty" }
+      stage_name       = "prd"
     }
   }
 }

@@ -25,7 +25,7 @@ resource "aws_api_gateway_integration" "api_integration" {
   type                    = each.value.type_integration
   request_templates       = each.value.request_templates
   passthrough_behavior    = each.value.passthrough_behavior
-  uri                     = each.value.uri != null ? "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${each.value.uri}/invocations" : null 
+  uri                     = each.value.uri != null ? "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${each.value.uri}/invocations" : null
 }
 
 resource "aws_api_gateway_method_response" "api_response" {
@@ -47,10 +47,10 @@ resource "aws_api_gateway_method_response" "api_response" {
 
 resource "aws_api_gateway_integration_response" "api_integration_response" {
   for_each    = var.api_resources
-  rest_api_id  = var.api_id
-  resource_id  = each.value.resource_id
-  http_method  = aws_api_gateway_method.api_method[each.key].http_method
-  status_code  = "200"
+  rest_api_id = var.api_id
+  resource_id = each.value.resource_id
+  http_method = aws_api_gateway_method.api_method[each.key].http_method
+  status_code = "200"
 
   response_parameters = {
     "method.response.header.Access-Control-Allow-Origin"  = "'*'"

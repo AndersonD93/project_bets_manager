@@ -40,26 +40,26 @@ data "aws_iam_policy_document" "allow_access_from_another_principal" {
 }
 
 resource "aws_s3_object" "html_files" {
-  for_each = fileset("${path.module}/../../templates/html", "*.html")
-  bucket   = aws_s3_bucket.static_site.bucket
-  key      = "html/${each.value}"
-  source   = "${path.module}/../../templates/html/${each.value}"
+  for_each     = fileset("${path.module}/../../templates/html", "*.html")
+  bucket       = aws_s3_bucket.static_site.bucket
+  key          = "html/${each.value}"
+  source       = "${path.module}/../../templates/html/${each.value}"
   content_type = "text/html"
 }
 
 resource "aws_s3_object" "css_files" {
-  for_each = fileset("${path.module}/../../templates/css", "*.css")
-  bucket   = aws_s3_bucket.static_site.bucket
-  key      = "css/${each.value}"
-  source   = "${path.module}/../../templates/css/${each.value}"
+  for_each     = fileset("${path.module}/../../templates/css", "*.css")
+  bucket       = aws_s3_bucket.static_site.bucket
+  key          = "css/${each.value}"
+  source       = "${path.module}/../../templates/css/${each.value}"
   content_type = "text/css"
 }
 
 resource "aws_s3_object" "js_files" {
-  for_each = fileset("${path.module}/../../templates/js", "*.js")
-  bucket   = aws_s3_bucket.static_site.bucket
-  key      = "js/${each.value}"
-  source   = "${path.module}/../../templates/js/${each.value}"
+  for_each     = fileset("${path.module}/../../templates/js", "*.js")
+  bucket       = aws_s3_bucket.static_site.bucket
+  key          = "js/${each.value}"
+  source       = "${path.module}/../../templates/js/${each.value}"
   content_type = "application/javascript"
 }
 

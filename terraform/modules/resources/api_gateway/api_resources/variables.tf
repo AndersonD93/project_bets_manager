@@ -7,19 +7,19 @@ variable "api_root_resource_id" {
 }
 
 variable "authorization" {
-  type = string
+  type    = string
   default = "NONE"
   validation {
-    condition = contains(["NONE", "CUSTOM", "AWS_IAM","COGNITO_USER_POOLS"], var.authorization)
+    condition     = contains(["NONE", "CUSTOM", "AWS_IAM", "COGNITO_USER_POOLS"], var.authorization)
     error_message = "Error los valores validos son NONE,CUSTOM,AWS_IAM,COGNITO_USER_POOLS"
   }
 }
 
-variable "type_integration"{
-    type = string
-    default = "HTTP"
-    validation {
-    condition = contains(["AWS", "AWS_PROXY", "HTTP", "MOCK", "HTTP_PROXY"], var.type_integration)
+variable "type_integration" {
+  type    = string
+  default = "HTTP"
+  validation {
+    condition     = contains(["AWS", "AWS_PROXY", "HTTP", "MOCK", "HTTP_PROXY"], var.type_integration)
     error_message = "Error los valores validos son AWS,AWS_PROXY,HTTP,MOCK,HTTP_PROXY"
   }
 }
@@ -41,7 +41,7 @@ variable "uri" {
   type        = string
   default     = null
   validation {
-    condition = var.uri == null && var.type_integration != "MOCK"
+    condition     = var.uri == null && var.type_integration != "MOCK"
     error_message = "uri es obligatorio cuando type_integration no es MOCK."
   }
 }

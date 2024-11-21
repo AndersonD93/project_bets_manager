@@ -12,12 +12,12 @@ resource "aws_secretsmanager_secret" "secrets_project" {
 }
 
 locals {
-  secret_map ={
+  secret_map = {
     UrlApiManageMatches                   = "${module.api_resource_create_update_results.url_invoke_api["create_matches_football_data_post"]}/manage_matches",
     UrlApiUpdateResults                   = "${module.api_resource_create_update_results.url_invoke_api["create_matches_football_data_post"]}/update_results",
     UrlApiPutBets                         = "${module.api_resource_create_update_results.url_invoke_api["create_matches_football_data_post"]}/put_bets",
     UrlApiCreateMatchesForAPiFootballData = "${module.api_resource_create_update_results.url_invoke_api["create_matches_football_data_post"]}/create-matches-football-data",
-    X-Auth-Token                          = jsondecode(data.aws_secretsmanager_secret_version.existing_secret_version.secret_string)["X-Auth-Token"] 
+    X-Auth-Token                          = jsondecode(data.aws_secretsmanager_secret_version.existing_secret_version.secret_string)["X-Auth-Token"]
   }
 }
 

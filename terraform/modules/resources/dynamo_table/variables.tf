@@ -25,14 +25,14 @@ variable "dynamo_tables" {
   description = "Lista de tablas de dynamo"
 
   type = map(object({
-    table_name              = string,
-    hash_key                = string,
-    range_key               = string,
-    attributes              = list(map(string)),
-    stream_enabled          = optional(bool),
-    stream_view_type        = optional(string),
-    global_secondary_index  = optional(map(string)),
-    tags                    = optional(map(string))
+    table_name             = string,
+    hash_key               = string,
+    range_key              = string,
+    attributes             = list(map(string)),
+    stream_enabled         = optional(bool),
+    stream_view_type       = optional(string),
+    global_secondary_index = optional(map(string)),
+    tags                   = optional(map(string))
     })
   )
 }

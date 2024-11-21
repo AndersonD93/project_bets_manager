@@ -1,6 +1,6 @@
 locals {
   s3_list_name = {
-    bucket_host   = "${var.project}-host-s3-bets-manager"
+    bucket_host    = "${var.project}-host-s3-bets-manager"
     bucket_backend = "${var.project}-state-backend-ci-cd-ajduran"
   }
 

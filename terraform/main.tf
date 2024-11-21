@@ -7,7 +7,7 @@ terraform {
     bucket         = "cc-tf-state-backend-ci-cd-ajduran"
     key            = "tf-infra/terraform.tfstate"
     region         = "us-east-1"
-    encrypt        = true  
+    encrypt        = true
     dynamodb_table = "terraform-state-locking-ajduran2"
   }
 }
@@ -21,7 +21,7 @@ module "resources" {
   source = "./modules/resources"
 
   # Resoruces Input Vars
-  s3_list_name = local.s3_list_name
+  s3_list_name            = local.s3_list_name
   dynamo_tables_list_name = local.dynamo_tables_list_name
 }
 
