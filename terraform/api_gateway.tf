@@ -13,8 +13,7 @@ resource "aws_api_gateway_authorizer" "cognito_authorizer_module" {
   rest_api_id     = module.api_bets_manager.api_id
   identity_source = "method.request.header.Authorization"
   type            = "COGNITO_USER_POOLS"
-  provider_arns   = ["arn:aws:cognito-idp:us-east-1:122610499801:userpool/us-east-1_TpdDqGK9s"]
-  #provider_arns           = [aws_cognito_user_pool.my_user_pool.arn]
+  provider_arns   = [aws_cognito_user_pool.bets_user_pool.arn]
 }
 
 module "api_resource_put_bets" {
@@ -180,4 +179,11 @@ module "api_resource_update_results" {
       stage_name       = "prd"
     }
   }
+}
+
+resource "local_file" "config_js" {
+  filename = "${path.module}/templates/js/config.js"
+  content  = templatefile("${path.module}/templates/js/config.js", {
+    url_invoke_api = "${module.api_resource_create_update_results.url_invoke_api["create_matches_football_data_post"]}/get_secret"
+  })
 }

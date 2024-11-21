@@ -17,7 +17,9 @@ locals {
     UrlApiUpdateResults                   = "${module.api_resource_create_update_results.url_invoke_api["create_matches_football_data_post"]}/update_results",
     UrlApiPutBets                         = "${module.api_resource_create_update_results.url_invoke_api["create_matches_football_data_post"]}/put_bets",
     UrlApiCreateMatchesForAPiFootballData = "${module.api_resource_create_update_results.url_invoke_api["create_matches_football_data_post"]}/create-matches-football-data",
-    X-Auth-Token                          = jsondecode(data.aws_secretsmanager_secret_version.existing_secret_version.secret_string)["X-Auth-Token"]
+    X-Auth-Token                          = jsondecode(data.aws_secretsmanager_secret_version.existing_secret_version.secret_string)["X-Auth-Token"],
+    UserPoolId                            = aws_cognito_user_pool.bets_user_pool.id,
+    ClientId                              = aws_cognito_user_pool_client.app_bets_manager.id
   }
 }
 

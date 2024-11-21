@@ -19,7 +19,11 @@ output "lookup_score_user_table" {
 }
 
 output "url_invoke_api" {
-  value = module.api_resource_create_update_results.url_invoke_api["create_matches_football_data_post"]
+  value = "${module.api_resource_create_update_results.url_invoke_api["create_matches_football_data_post"]}/get_secret"
+}
+
+output "s3_bucket_website_url" {
+  value = module.resources.s3_bucket_website_url
 }
 
 

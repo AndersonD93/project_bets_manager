@@ -61,6 +61,7 @@ resource "aws_s3_object" "js_files" {
   key          = "js/${each.value}"
   source       = "${path.module}/../../templates/js/${each.value}"
   content_type = "application/javascript"
+  etag         = filemd5("${path.module}/../../templates/js/${each.value}")
 }
 
 resource "aws_s3_object" "index_html" {

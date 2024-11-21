@@ -40,7 +40,7 @@ module "lambdas_backend_api" {
       runtime     = "python3.12"
       source_arn  = "${module.api_bets_manager.api_arn}/*/*"
       environment_variables = {
-        "secret_name" = "project/appConfig"
+        "secret_name" = aws_secretsmanager_secret.secrets_project.name
       }
     },
     "put_bets" = {
