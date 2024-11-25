@@ -26,4 +26,7 @@ output "s3_bucket_website_url" {
   value = module.resources.s3_bucket_website_url
 }
 
+output "arn_method" {
+  value =module.api_resource_get_secret.method_arn
+}
 

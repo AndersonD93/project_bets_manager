@@ -38,7 +38,7 @@ module "api_resource_put_bets" {
       authorization    = "COGNITO_USER_POOLS"
       authorizer_id    = aws_api_gateway_authorizer.cognito_authorizer_module.id
       type_integration = "AWS"
-      uri              = module.lambdas_backend_api.lambda_arns["put_bets"]
+      uri              = module.lambdas_backend_api.invoke_arn["put_bets"]
       response_models  = { "application/json" = "Empty" }
       stage_name       = "prd"
     }
@@ -64,10 +64,9 @@ module "api_resource_get_secret" {
     "get_secret_get" = {
       resource_id      = module.api_bets_manager.api_resource_ids["get_secret"]
       http_method      = "GET"
-      authorization    = "COGNITO_USER_POOLS"
-      authorizer_id    = aws_api_gateway_authorizer.cognito_authorizer_module.id
-      type_integration = "AWS"
-      uri              = module.lambdas_backend_api.lambda_arns["get_secret"]
+      authorization    = "NONE"
+      type_integration = "AWS_PROXY"
+      uri              = module.lambdas_backend_api.invoke_arn["get_secret"]
       response_models  = { "application/json" = "Empty" }
       stage_name       = "prd"
     }
@@ -95,8 +94,8 @@ module "api_resource_manage_matches" {
       http_method      = "POST"
       authorization    = "COGNITO_USER_POOLS"
       authorizer_id    = aws_api_gateway_authorizer.cognito_authorizer_module.id
-      type_integration = "AWS"
-      uri              = module.lambdas_backend_api.lambda_arns["manage_matches"]
+      type_integration = "AWS_PROXY"
+      uri              = module.lambdas_backend_api.invoke_arn["manage_matches"]
       response_models  = { "application/json" = "Empty" }
       stage_name       = "prd"
     },
@@ -105,8 +104,8 @@ module "api_resource_manage_matches" {
       http_method      = "GET"
       authorization    = "COGNITO_USER_POOLS"
       authorizer_id    = aws_api_gateway_authorizer.cognito_authorizer_module.id
-      type_integration = "AWS"
-      uri              = module.lambdas_backend_api.lambda_arns["manage_matches"]
+      type_integration = "AWS_PROXY"
+      uri              = module.lambdas_backend_api.invoke_arn["manage_matches"]
       response_models  = { "application/json" = "Empty" }
       stage_name       = "prd"
     }
@@ -134,8 +133,8 @@ module "api_resource_create_update_results" {
       http_method      = "POST"
       authorization    = "COGNITO_USER_POOLS"
       authorizer_id    = aws_api_gateway_authorizer.cognito_authorizer_module.id
-      type_integration = "AWS"
-      uri              = module.lambdas_backend_api.lambda_arns["create_matches_for_futbol_data"]
+      type_integration = "AWS_PROXY"
+      uri              = module.lambdas_backend_api.invoke_arn["create_matches_for_futbol_data"]
       response_models  = { "application/json" = "Empty" }
       stage_name       = "prd"
     }
@@ -163,8 +162,8 @@ module "api_resource_update_results" {
       http_method      = "POST"
       authorization    = "COGNITO_USER_POOLS"
       authorizer_id    = aws_api_gateway_authorizer.cognito_authorizer_module.id
-      type_integration = "AWS"
-      uri              = module.lambdas_backend_api.lambda_arns["update_results"]
+      type_integration = "AWS_PROXY"
+      uri              = module.lambdas_backend_api.invoke_arn["update_results"]
       response_models  = { "application/json" = "Empty" }
       stage_name       = "prd"
     },
@@ -173,8 +172,8 @@ module "api_resource_update_results" {
       http_method      = "GET"
       authorization    = "COGNITO_USER_POOLS"
       authorizer_id    = aws_api_gateway_authorizer.cognito_authorizer_module.id
-      type_integration = "AWS"
-      uri              = module.lambdas_backend_api.lambda_arns["update_results"]
+      type_integration = "AWS_PROXY"
+      uri              = module.lambdas_backend_api.invoke_arn["update_results"]
       response_models  = { "application/json" = "Empty" }
       stage_name       = "prd"
     }

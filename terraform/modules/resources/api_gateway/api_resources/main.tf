@@ -21,11 +21,11 @@ resource "aws_api_gateway_integration" "api_integration" {
   rest_api_id             = var.api_id
   resource_id             = each.value.resource_id
   http_method             = aws_api_gateway_method.api_method[each.key].http_method
-  integration_http_method = each.value.http_method
+  integration_http_method = each.value.http_method == "OPTIONS" ? each.value.http_method : "POST"
   type                    = each.value.type_integration
   request_templates       = each.value.request_templates
   passthrough_behavior    = each.value.passthrough_behavior
-  uri                     = each.value.uri != null ? "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${each.value.uri}/invocations" : null
+  uri                     = try(each.value.uri, null)
 }
 
 resource "aws_api_gateway_method_response" "api_response" {
@@ -72,3 +72,5 @@ resource "aws_api_gateway_deployment" "api_deployment_put_bets" {
     aws_api_gateway_integration.api_integration
   ]
 }
+
+data "aws_caller_identity" "current" {}

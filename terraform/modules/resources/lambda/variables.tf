@@ -5,8 +5,7 @@ variable "lambda_map" {
     lambda_name           = string,
     lambda_zip            = string,
     handler               = string,
-    runtime               = string
-    source_arn            = string,
+    runtime               = string,
     environment_variables = optional(map(string))
     })
   )

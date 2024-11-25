@@ -11,11 +11,3 @@ resource "aws_lambda_function" "lambda_function" {
   }
 }
 
-resource "aws_lambda_permission" "lambda_permission" {
-  for_each      = var.lambda_map
-  statement_id  = "AllowExecutionFromAPI"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.lambda_function[each.key].function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = each.value.source_arn
-}
