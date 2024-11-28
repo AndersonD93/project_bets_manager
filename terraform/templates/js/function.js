@@ -296,9 +296,9 @@ export async function fetchCreateMatches(createMatchesUrl,competitionId,matchday
         const responseData = await apiResponse.json();
 
         if (apiResponse.ok) {
-            alert('Partido creado exitosamente '+ responseData.body);
+            alert('Partido creado exitosamente '+ responseData.message);
         } else {
-            alert('Error: ' + responseData.body);
+            alert('Error: ' + responseData.message);
         }
 
     } catch (error) {

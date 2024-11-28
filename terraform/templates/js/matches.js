@@ -6,13 +6,14 @@ window.poolDataUrl = null;
 (async function() {
     try {
         const data = await getPoolData(config.apiUrlSecrets);
-        const parsedBody = JSON.parse(data.body);
+                if (!data) {
+                    throw new Error("No se obtuvieron los datos del pool");
+                }
+        const parsedData = typeof data === "string" ? JSON.parse(data) : data;
 
-        console.log(parsedBody)
-
-        if (parsedBody.UrlApiCreateMatchesForAPiFootballData) {
+        if (parsedData.UrlApiCreateMatchesForAPiFootballData) {
             window.poolDataUrl = {
-                UrlApiCreateMatchesForAPiFootballData: parsedBody.UrlApiCreateMatchesForAPiFootballData
+                UrlApiCreateMatchesForAPiFootballData: parsedData.UrlApiCreateMatchesForAPiFootballData
             };
         } else {
             console.error("No se obtuvieron UrlApiCreateMatchesForAPiFootballData.");

@@ -53,7 +53,7 @@ resource "aws_api_gateway_integration_response" "api_integration_response" {
   status_code = "200"
 
   response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+    "method.response.header.Access-Control-Allow-Origin"  = each.value.url_cors_allow
     "method.response.header.Access-Control-Allow-Methods" = "'GET,POST,OPTIONS'"
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
   }

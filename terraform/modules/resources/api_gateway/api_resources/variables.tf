@@ -53,13 +53,14 @@ variable "api_resources" {
     resource_id          = string,
     http_method          = string,
     authorization        = string,
-    authorizer_id        = optional(string)
+    authorizer_id        = optional(string),
     type_integration     = string,
     uri                  = optional(string)
     request_templates    = optional(map(string)),
     passthrough_behavior = optional(string),
     response_models      = optional(map(string)),
-    stage_name           = string
+    stage_name           = string,
+    url_cors_allow       = string
     })
   )
 }

@@ -4,14 +4,14 @@ import config  from './config.js';
         (async function() {
             try {
                 const data = await getPoolData(config.apiUrlSecrets);
-                if (!data.body) {
+                if (!data) {
                     throw new Error("No se obtuvieron los datos del pool");
                 }
                 
-                const parsedBody = JSON.parse(data.body);
+                const parsedData = typeof data === "string" ? JSON.parse(data) : data;
                 const poolData = {
-                    UserPoolId: parsedBody.UserPoolId,
-                    ClientId: parsedBody.ClientId
+                    UserPoolId: parsedData.UserPoolId,
+                    ClientId: parsedData.ClientId
                 };
 
                 if (!poolData.UserPoolId || !poolData.ClientId) {

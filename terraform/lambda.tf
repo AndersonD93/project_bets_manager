@@ -4,7 +4,6 @@ module "lambdas_backend_api" {
   lambda_map = {
     "update_results" = {
       lambda_name = "update_results"
-      lambda_zip  = "${path.module}/templates/lambdas_code/update_result.zip"
       handler     = "update_result.lambda_handler"
       runtime     = "python3.12"
       environment_variables = {
@@ -14,7 +13,6 @@ module "lambdas_backend_api" {
     },
     "manage_matches" = {
       lambda_name = "manage_matches"
-      lambda_zip  = "${path.module}/templates/lambdas_code/manage_matches.zip"
       handler     = "manage_matches.lambda_handler"
       runtime     = "python3.12"
       environment_variables = {
@@ -23,16 +21,16 @@ module "lambdas_backend_api" {
     },
     "create_matches_for_futbol_data" = {
       lambda_name = "create_matches_for_futbol_data"
-      lambda_zip  = "${path.module}/templates/lambdas_code/create_matches_for_futbol_data.zip"
       handler     = "create_matches_for_futbol_data.lambda_handler"
       runtime     = "python3.12"
       environment_variables = {
         "matches_table" = module.dynamo_tables_bets_manager.dynamo_table_name["matches_table"]
+        "secret_name"   = aws_secretsmanager_secret.secrets_project.name
+        "region"        = var.region
       }
     },
     "get_secret" = {
       lambda_name = "get_secret"
-      lambda_zip  = "${path.module}/templates/lambdas_code/get_secret.zip"
       handler     = "get_secret.lambda_handler"
       runtime     = "python3.12"
       environment_variables = {
@@ -41,7 +39,6 @@ module "lambdas_backend_api" {
     },
     "put_bets" = {
       lambda_name = "put_bets"
-      lambda_zip  = "${path.module}/templates/lambdas_code/put_bets.zip"
       handler     = "put_bets.lambda_handler"
       runtime     = "python3.12"
       environment_variables = {
@@ -50,7 +47,6 @@ module "lambdas_backend_api" {
     },
     recalculate_score = {
       lambda_name = "recalculate_score"
-      lambda_zip  = "${path.module}/templates/lambdas_code/recalculate_score.zip"
       handler     = "recalculate_score.lambda_handler"
       runtime     = "python3.12"
       environment_variables = {
@@ -61,7 +57,6 @@ module "lambdas_backend_api" {
     },
     get_matches = {
       lambda_name = "get_matches"
-      lambda_zip  = "${path.module}/templates/lambdas_code/get_matches.zip"
       handler     = "get_matches.lambda_handler"
       runtime     = "python3.12"
       environment_variables = {
@@ -70,7 +65,6 @@ module "lambdas_backend_api" {
     },
     get_scores = {
       lambda_name = "get_scores"
-      lambda_zip  = "${path.module}/templates/lambdas_code/get_scores.zip"
       handler     = "get_scores.lambda_handler"
       runtime     = "python3.12"
       environment_variables = {
