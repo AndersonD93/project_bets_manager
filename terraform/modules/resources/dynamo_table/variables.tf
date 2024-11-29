@@ -27,7 +27,7 @@ variable "dynamo_tables" {
   type = map(object({
     table_name             = string,
     hash_key               = string,
-    range_key              = string,
+    range_key              = optional(string),
     attributes             = list(map(string)),
     stream_enabled         = optional(bool),
     stream_view_type       = optional(string),

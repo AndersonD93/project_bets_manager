@@ -5,7 +5,10 @@ window.poolDataUrl = null;
 (async function() {
     try {
         const data = await getPoolData(config.apiUrlSecrets);
-        const parsedBody = JSON.parse(data.body);
+                if (!data) {
+                    throw new Error("No se obtuvieron los datos del pool");
+                }
+        const parsedBody = typeof data === "string" ? JSON.parse(data) : data;
 
         if (parsedBody.UrlApiManageMatches && parsedBody.UrlApiPutBets) {
             window.poolDataUrl = {

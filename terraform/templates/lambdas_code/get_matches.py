@@ -29,15 +29,20 @@ def lambda_handler(event, context):
             'statusCode': 200,
             'body': json.dumps(match_list_not_finish),
             'headers': {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'  # Permitir el acceso desde el frontend
-            }
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization"
+            },
         }
     except Exception as e:
         return {
             'statusCode': 500,
             'body': json.dumps(str(e)),
             'headers': {
-                'Content-Type': 'application/json'
-            }
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization"
+            },
         }

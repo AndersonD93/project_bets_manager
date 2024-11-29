@@ -16,10 +16,10 @@ module "dynamo_tables_bets_manager" {
     results_table = {
       table_name = "results_table"
       hash_key   = "match_id"
-      range_key  = "extact_score"
+      range_key  = "exact_score"
       attributes = [
         { name = "match_id", type = "S" },
-        { name = "extact_score", type = "S" }
+        { name = "exact_score", type = "S" }
       ]
       stream_enabled   = true
       stream_view_type = "NEW_AND_OLD_IMAGES"
@@ -28,10 +28,8 @@ module "dynamo_tables_bets_manager" {
     matches_table = {
       table_name = "matches_table"
       hash_key   = "match_id"
-      range_key  = "status"
       attributes = [
-        { name = "match_id", type = "S" },
-        { name = "status", type = "S" }
+        { name = "match_id", type = "S" }
       ]
       tags = { Project = var.project }
     },

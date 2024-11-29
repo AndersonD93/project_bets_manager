@@ -10,9 +10,22 @@ matches_table = dynamodb.Table(os.getenv('matches_table'))
 
 
 def lambda_handler(event, context):
-    match_id = event['match_id']
-    real_result = event['real_result']
-    exact_score = event['exact_score']
+    if 'body' in event and event['body']:
+        body = json.loads(event['body'])
+    else:
+        return {
+            "statusCode": 400,
+            "body": "Error: No se encontró el cuerpo de la solicitud."
+        }
+    try:
+        match_id = body['match_id']
+        real_result = body['real_result']
+        exact_score = body['exact_score']
+    except KeyError as e:
+        return {
+            "statusCode": 400,
+            "body": f"Error: Falta la clave {str(e)} en el cuerpo de la solicitud."
+        }    
     
     try:
         # Actualizar el resultado real en DynamoDB
@@ -40,7 +53,7 @@ def lambda_handler(event, context):
         )
         return {
             'statusCode': 200,
-            'body': json.dumps('Resultado actualizado exitosamente.')
+            'body': json.dumps('Resultado actualizado exitosamente. ')
         }
     
     except ClientError as e:

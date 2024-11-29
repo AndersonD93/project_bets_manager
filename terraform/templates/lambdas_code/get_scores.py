@@ -29,7 +29,7 @@ def lambda_handler(event, context):
         # Verifica si hay puntajes en la tabla
         if not items:
             return {
-                'statusCode': 404,
+                'statusCode': 200,
                 'body': json.dumps({'message': 'No se encontraron puntajes.'}),
                 'headers': {
                     'Content-Type': 'application/json',

@@ -4,7 +4,7 @@ module "lambdas_backend_api" {
   lambda_map = {
     "update_results" = {
       lambda_name = "update_results"
-      handler     = "update_result.lambda_handler"
+      handler     = "update_results.lambda_handler"
       runtime     = "python3.12"
       environment_variables = {
         "results_table" = module.dynamo_tables_bets_manager.dynamo_table_name["results_table"]
@@ -102,9 +102,9 @@ module "lambda_permission_api" {
       source_arn  = module.api_resource_put_bets.method_arn["put_bets_put"]
       principal   = "apigateway.amazonaws.com"
     },
-    get_matches_post = {
+    get_matches = {
       lambda_name = module.lambdas_backend_api.lambda_name["get_matches"]
-      source_arn  = module.api_resource_manage_matches.method_arn["manage_matches_post"]
+      source_arn  = module.api_resource_manage_matches.method_arn["manage_matches_get"]
       principal   = "apigateway.amazonaws.com"
     },
     get_scores = {

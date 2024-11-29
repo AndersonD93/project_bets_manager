@@ -201,7 +201,7 @@ export async function fetchMatches(UrlApiManageMatches) {
         console.log("API response:", responseData);
 
         // Parsear el cuerpo si viene como string
-        const matches = JSON.parse(responseData.body);
+        const matches = responseData;
 
         // Verificar si matches es un array
         if (Array.isArray(matches)) {
