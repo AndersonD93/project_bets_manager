@@ -45,6 +45,7 @@ resource "aws_s3_object" "html_files" {
   key          = "html/${each.value}"
   source       = "${path.module}/../../templates/html/${each.value}"
   content_type = "text/html"
+  etag         = filemd5("${path.module}/../../templates/html/${each.value}")
 }
 
 resource "aws_s3_object" "css_files" {

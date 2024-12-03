@@ -6,10 +6,8 @@ module "dynamo_tables_bets_manager" {
     score_user_table = {
       table_name = "score_user"
       hash_key   = "user_id"
-      range_key  = "total_score"
       attributes = [
-        { name = "user_id", type = "S" },
-        { name = "total_score", type = "N" }
+        { name = "user_id", type = "S" }
       ]
       tags = { Project = var.project }
     },
