@@ -1,11 +1,14 @@
-import { getPoolData, waitForPoolData,fetchMatches,logout,placeBet } from './function.js';
-import config  from './config.js';
+import { getPoolData, waitForPoolData, fetchMatches, logout, placeBet } from './function.js';
+import config from './config.js';
 
 window.poolDataUrl = null;
-(async function() {
+(async function () {
     try {
         const data = await getPoolData(config.apiUrlSecrets);
-        const parsedBody = JSON.parse(data.body);
+        if (!data) {
+            throw new Error("No se obtuvieron los datos del pool");
+        }
+        const parsedBody = typeof data === "string" ? JSON.parse(data) : data;
 
         if (parsedBody.UrlApiManageMatches && parsedBody.UrlApiPutBets) {
             window.poolDataUrl = {
@@ -22,12 +25,12 @@ window.poolDataUrl = null;
 
 document.addEventListener('DOMContentLoaded', async function () {
     console.log("DOMContentLoaded ejecutado");
-    
+
 
     const matchSelect = document.getElementById('match_select');
     const idToken = sessionStorage.getItem('idToken');
     const username = sessionStorage.getItem('username');
-    
+
     await waitForPoolData();
 
     if (!idToken) {
@@ -38,11 +41,11 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 });
 
-document.getElementById('logout-button').addEventListener('click', function() {
+document.getElementById('logout-button').addEventListener('click', function () {
     logout();
 });
 
-document.getElementById('place-bet-button').addEventListener('click', function() {
+document.getElementById('place-bet-button').addEventListener('click', function () {
     const selectedMatch = document.getElementById('match_select').value;
     const realResult = document.getElementById('bet_result').value;
     const localGoals = document.getElementById('local_goals').value;

@@ -15,6 +15,12 @@ def lambda_handler(event, context):
     else:
         return {
             "statusCode": 400,
+            'headers': {
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization"
+            },
             "body": "Error: No se encontró el cuerpo de la solicitud."
         }
     try:
@@ -24,6 +30,12 @@ def lambda_handler(event, context):
     except KeyError as e:
         return {
             "statusCode": 400,
+            'headers': {
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization"
+            },
             "body": f"Error: Falta la clave {str(e)} en el cuerpo de la solicitud."
         }    
     
@@ -53,11 +65,23 @@ def lambda_handler(event, context):
         )
         return {
             'statusCode': 200,
+            'headers': {
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization"
+            },
             'body': json.dumps('Resultado actualizado exitosamente. ')
         }
     
     except ClientError as e:
         return {
             'statusCode': 400,
+            'headers': {
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization"
+            },
             'body': json.dumps(f"Error: {str(e)}")
         }

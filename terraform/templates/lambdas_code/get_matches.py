@@ -5,26 +5,36 @@ import os
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(os.getenv('matches_table'))
 
-
 def lambda_handler(event, context):
     try:
         # Obtener todos los partidos de la tabla
         response = table.scan()
+        
+        # Imprimir la respuesta de DynamoDB para depuración
+        print(f"Response from DynamoDB: {response}")
+        
         matches = response.get('Items', [])
 
-        # Crear una lista de partidos con match_id y teams
-        match_list = [{'match_id': match['match_id'], 'teams': match['teams'], 'status':match['status']} for match in matches]
+        # Si no hay elementos en la respuesta
+        if not matches:
+            print("No se encontraron partidos en la tabla.")
         
-        print(f"match_list {match_list}")
+        # Crear una lista de partidos con match_id, teams y status
+        match_list = [{'match_id': match['match_id'], 'teams': match['teams'], 'status': match['status']} for match in matches] 
         
+        print(f"match_list: {match_list}")
+
         match_list_not_finish = []
-        
+
         for match in match_list:
-            if match['status'] != 'FINISHED':
+            status = match['status'].strip()
+            print(f"Estado del partido {match['match_id']}: {status}")
+
+            if status != 'FINISHED':  # Filtra los partidos que no han terminado
                 match_list_not_finish.append(match)
             else:
-                print(f"Partido ya ha finalizado {match['teams']}")
-                
+                print(f"Partido ya ha finalizado: {match['teams']}")
+
         return {
             'statusCode': 200,
             'body': json.dumps(match_list_not_finish),
@@ -36,6 +46,7 @@ def lambda_handler(event, context):
             },
         }
     except Exception as e:
+        print(f"Error: {str(e)}")
         return {
             'statusCode': 500,
             'body': json.dumps(str(e)),

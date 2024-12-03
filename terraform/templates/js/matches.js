@@ -1,14 +1,14 @@
-import { getPoolData, waitForPoolData,fetchCreateMatches,logout} from './function.js';
-import config  from './config.js';
+import { getPoolData, waitForPoolData, fetchCreateMatches, logout } from './function.js';
+import config from './config.js';
 
 
 window.poolDataUrl = null;
-(async function() {
+(async function () {
     try {
         const data = await getPoolData(config.apiUrlSecrets);
-                if (!data) {
-                    throw new Error("No se obtuvieron los datos del pool");
-                }
+        if (!data) {
+            throw new Error("No se obtuvieron los datos del pool");
+        }
         const parsedData = typeof data === "string" ? JSON.parse(data) : data;
 
         if (parsedData.UrlApiCreateMatchesForAPiFootballData) {
@@ -38,6 +38,6 @@ document.getElementById('matchesForm').addEventListener('submit', async function
         window.location.href = 'index.html';
     } else {
         console.log('Autenticación Correcta');
-        fetchCreateMatches(window.poolDataUrl.UrlApiCreateMatchesForAPiFootballData,competitionId,matchday);
+        fetchCreateMatches(window.poolDataUrl.UrlApiCreateMatchesForAPiFootballData, competitionId, matchday);
     }
 });

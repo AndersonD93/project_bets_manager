@@ -1,11 +1,14 @@
-import { getPoolData, waitForPoolData,fetchScores,displayScores,logout } from './function.js';
-import config  from './config.js';
+import { getPoolData, waitForPoolData, fetchScores, displayScores, logout } from './function.js';
+import config from './config.js';
 
 window.poolDataUrl = null;
-(async function() {
+(async function () {
     try {
         const data = await getPoolData(config.apiUrlSecrets);
-        const parsedBody = JSON.parse(data.body);
+        if (!data) {
+            throw new Error("No se obtuvieron los datos del pool");
+        }
+        const parsedBody = typeof data === "string" ? JSON.parse(data) : data;
 
         if (parsedBody.UrlApiUpdateResults && parsedBody.UrlApiPutBets) {
             window.poolDataUrl = {
@@ -33,6 +36,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 });
 
-document.getElementById('logout-button').addEventListener('click', function() {
+document.getElementById('logout-button').addEventListener('click', function () {
     logout();
 });
