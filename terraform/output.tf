@@ -30,3 +30,8 @@ output "arn_method" {
   value =module.api_resource_get_secret.method_arn
 }
 
+output "bets_users_global_index_name" {
+  description = "Nombre del índice global de la tabla bets_users"
+  value       = module.dynamo_tables_bets_manager.global_secondary_index_names["bets_users_table"]
+}
+

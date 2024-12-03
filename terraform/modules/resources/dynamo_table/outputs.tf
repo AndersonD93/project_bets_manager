@@ -22,3 +22,7 @@ output "dynamo_table_stream_arn" {
   value       = aws_dynamodb_table.dynamo_table["results_table"].stream_arn
 }
 
+output "global_secondary_index_names" {
+  description = "Nombres de los índices globales de las tablas DynamoDB"
+  value       = { for name, table in var.dynamo_tables : name => table.global_secondary_index != null ? table.global_secondary_index.name : null }
+}

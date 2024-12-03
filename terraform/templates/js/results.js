@@ -57,7 +57,6 @@ document.getElementById('update-result-button').addEventListener('click', async 
             const response = await updateResult(window.poolDataUrl.UrlApiUpdateResults, selectedMatch, realResult, exactScore);
 
             if (response !== null) { // Comparación corregida
-                alert("Resultado actualizado exitosamente.");
                 window.location.href = "results.html";
             } else {
                 const errorData = await response.json();

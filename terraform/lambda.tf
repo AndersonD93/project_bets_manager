@@ -50,9 +50,10 @@ module "lambdas_backend_api" {
       handler     = "recalculate_score.lambda_handler"
       runtime     = "python3.12"
       environment_variables = {
-        "bets_table"    = module.dynamo_tables_bets_manager.dynamo_table_name["bets_users_table"]
-        "results_table" = module.dynamo_tables_bets_manager.dynamo_table_name["results_table"]
-        "score_table"   = module.dynamo_tables_bets_manager.dynamo_table_name["score_user_table"]
+        "bets_table"                   = module.dynamo_tables_bets_manager.dynamo_table_name["bets_users_table"]
+        "results_table"                = module.dynamo_tables_bets_manager.dynamo_table_name["results_table"]
+        "score_table"                  = module.dynamo_tables_bets_manager.dynamo_table_name["score_user_table"]
+        "bets_users_global_index_name" = module.dynamo_tables_bets_manager.global_secondary_index_names["bets_users_table"]
       }
     },
     get_matches = {

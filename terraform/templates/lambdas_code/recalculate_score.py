@@ -3,10 +3,11 @@ import boto3
 from botocore.exceptions import ClientError
 import os
 
-dynamodb = boto3.resource('dynamodb')
-bets_table = dynamodb.Table(os.getenv('bets_table'))
-results_table = dynamodb.Table(os.getenv('results_table'))
-score_table = dynamodb.Table(os.getenv('score_table'))
+dynamodb                     = boto3.resource('dynamodb')
+bets_table                   = dynamodb.Table(os.getenv('bets_table'))
+results_table                = dynamodb.Table(os.getenv('results_table'))
+score_table                  = dynamodb.Table(os.getenv('score_table'))
+bets_users_global_index_name = os.getenv('bets_users_global_index_name')
 
 
 def lambda_handler(event, context):
@@ -24,7 +25,7 @@ def lambda_handler(event, context):
 
                 # Obtener todas las apuestas de los usuarios para este partido
                 bets = bets_table.query(
-                    IndexName="match_id-user_id-index",
+                    IndexName=bets_users_global_index_name,
                     KeyConditionExpression="match_id = :match_id",
                     ExpressionAttributeValues={":match_id": match_id}
                 )['Items']
