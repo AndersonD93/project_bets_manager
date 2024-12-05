@@ -32,9 +32,11 @@ def lambda_handler(event, context):
                 'statusCode': 200,
                 'body': json.dumps({'message': 'No se encontraron puntajes.'}),
                 'headers': {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
-                }
+                    "Access-Control-Allow-Origin": "*",
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+                    "Access-Control-Allow-Headers": "Content-Type, Authorization"
+                },
             }
 
         # Convertir Decimals a tipos nativos de Python
@@ -48,9 +50,11 @@ def lambda_handler(event, context):
             'statusCode': 200,
             'body': json.dumps(sorted_items),
             'headers': {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            }
+                    "Access-Control-Allow-Origin": "*",
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+                    "Access-Control-Allow-Headers": "Content-Type, Authorization"
+                },
         }
 
     except Exception as e:
@@ -59,7 +63,9 @@ def lambda_handler(event, context):
             'statusCode': 500,
             'body': json.dumps({'message': f"Error interno al obtener los puntajes: {str(e)}"}),
             'headers': {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            }
+                    "Access-Control-Allow-Origin": "*",
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+                    "Access-Control-Allow-Headers": "Content-Type, Authorization"
+                },
         }

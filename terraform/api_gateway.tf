@@ -38,7 +38,7 @@ module "api_resource_put_bets" {
       http_method      = "POST"
       authorization    = "COGNITO_USER_POOLS"
       authorizer_id    = aws_api_gateway_authorizer.cognito_authorizer_module.id
-      type_integration = "AWS"
+      type_integration = "AWS_PROXY"
       uri              = module.lambdas_backend_api.invoke_arn["put_bets"]
       response_models  = { "application/json" = "Empty" }
       stage_name       = "prd"

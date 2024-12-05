@@ -33,6 +33,10 @@ export function login(userPool) {
             document.getElementById('login-container').classList.add('hidden');
             document.getElementById('after-login-container').classList.remove('hidden');
 
+            // Mostrar el grupo de usuario junto al texto "Bienvenido"
+            const userGroupSpan = document.getElementById('user-group');
+            userGroupSpan.textContent = userGroup ? `(${userGroup})` : '';
+
             // Mostrar opciones en función del grupo de usuario
             if (userGroup === 'admin') {
                 document.getElementById('admin-options').classList.remove('hidden');
@@ -90,32 +94,43 @@ export function waitForPoolData() {
     });
 }
 
-export function fetchScores(UrlApiUpdateResults) {
+export async function fetchScores(UrlApiUpdateResults) {
     const idToken = sessionStorage.getItem('idToken');
 
-    // Aquí llamarías a tu API para obtener los puntajes, este es un ejemplo básico
-    fetch(UrlApiUpdateResults, {
-        method: 'GET',
-        headers: {
-            'Authorization': idToken
-        }
-    })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Datos recibidos de la API:', data); // Muestra la respuesta completa
-            const scores = JSON.parse(data.body); // Analiza el body aquí
-
-            if (scores && scores.length > 0) { // Verifica que hay puntajes
-                displayScores(scores);
-            } else {
-                alert('No se encontraron puntajes.');
-            }
-        })
-        .catch(error => {
-            console.error('Error al obtener los puntajes:', error);
-            alert('Hubo un problema al cargar los puntajes.');
+    try {
+        const response = await fetch(UrlApiUpdateResults, {
+            method: 'GET',
+            headers: {
+                'Authorization': idToken,
+                'Content-Type': 'application/json'
+            },
         });
-}
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status} - ${response.statusText}`);
+        }
+        const responseData = await response.json();
+        console.log("API response:", responseData);
+
+        if (Array.isArray(responseData) && responseData.length > 0) {
+            // Accede al primer elemento del array
+            const firstItem = responseData[0];
+            
+            if (firstItem.total_score) {
+                displayScores(responseData); // Llama a tu función para mostrar puntajes
+            } else {
+                alert('El primer elemento no tiene un puntaje válido.');
+            }
+        } else if (responseData.message) {
+            alert(responseData.message); // Muestra el mensaje del backend
+        } else {
+            alert('No se encontraron puntajes ni mensaje.');
+        }
+
+    } catch (error) {
+        console.error('Error al obtener los puntajes:', error);
+        alert('Hubo un problema al cargar los puntajes.');
+    }    
+};
 
 export function displayScores(score) {
     const tableBody = document.getElementById('scores-table').querySelector('tbody');

@@ -48,6 +48,14 @@ resource "aws_s3_object" "html_files" {
   etag         = filemd5("${path.module}/../../templates/html/${each.value}")
 }
 
+resource "aws_s3_object" "index_html_file" {
+  bucket       = aws_s3_bucket.static_site.bucket
+  key          = "index.html"
+  source       = "${path.module}/../../templates/index.html"
+  content_type = "text/html"
+  etag         = filemd5("${path.module}/../../templates/index.html")
+}
+
 resource "aws_s3_object" "css_files" {
   for_each     = fileset("${path.module}/../../templates/css", "*.css")
   bucket       = aws_s3_bucket.static_site.bucket
