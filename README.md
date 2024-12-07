@@ -22,6 +22,7 @@ Este proyecto demuestra una arquitectura serverless utilizando los servicios de 
 - **API Gateway**: Gestión de API.
 - **DynamoDB**: Almacenamiento de datos.
 - **S3**: Hosting de archivos estáticos.
+- **Cognito**: Servicio para autenticación y autorización de usuarios.
 - **CloudFront**: Red de distribución de contenido (CDN). (Proximo mvp)
 
 Está diseñado para ser implementado fácilmente utilizando Terraform, lo que permite un aprovisionamiento consistente de la infraestructura.
