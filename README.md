@@ -62,11 +62,11 @@ Sigue estos pasos para desplegar el proyecto:
    Reemplaza `<TU_API_TOKEN>` con el token proporcionado por football-data.org.
 
 3. **Crea el archivo `config.js`**:
-   Crea un archivo llamado `config.js` en la carpeta `templates/js` con el siguiente contenido:
+   Crea un archivo llamado `config.js` en la carpeta `templates/js` con el siguiente contenido: (Este generara de forma dinamica la url requerida para la obtención de secretos)
    ```javascript
    const config = {
        development: {
-           apiUrlSecrets: "<URL_API_SECRETS_DEV>"
+           apiUrlSecrets: "${url_invoke_api}"
        }
    };
 
@@ -74,26 +74,55 @@ Sigue estos pasos para desplegar el proyecto:
 
    export default config[environment];
    ```
-
-4. **Instala los módulos de Terraform**:
+4. **Inicializa Terraform usando el backend local**:
+   Comenta el bloque `backend` en el archivo `main.tf` y ejecuta los siguientes comandos para aprovisionar los recursos iniciales:
    ```bash
    terraform init
+   terraform plan
+   terraform apply
    ```
 
-5. **Personaliza las variables**:
+5. **Configura el backend remoto en Terraform(Opcional)**:
+   Descomenta el bloque `backend` en el archivo `main.tf`(Opcional si quieres manejar tu backend en forma remota):
+   ```hcl
+   terraform {
+       backend "s3" {
+           bucket         = "mi-bucket-unico-para-tf-state"
+           key            = "tf-infra/terraform.tfstate"
+           region         = "us-east-1"
+           encrypt        = true
+           dynamodb_table = "terraform-state-locking-ajduran2"
+       }
+   }
+   ```
+   Además, modifica la línea bucket_name dentro del módulo tf-state en main.tf para que coincida con el nombre del bucket configurado:
+
+   ```hcl
+      module "tf-state" {
+      source      = "./modules/tf-state"
+      bucket_name = "mi-bucket-unico-para-tf-state"
+   }
+   ```
+   Luego, vuelve a inicializar y aplica los cambios:
+   ```bash
+   terraform init
+   terraform apply
+   ```
+
+6. **Personaliza las variables**:
    Actualiza el archivo `variables.tf` o proporciona un archivo `terraform.tfvars` con tu configuración:
    ```hcl
    region = "us-east-1"
    project = "bets-manager"
    ```
 
-6. **Despliega la infraestructura**:
+7. **Despliega la infraestructura**:
    ```bash
    terraform apply
    ```
    Confirma los cambios escribiendo `yes` cuando se te solicite.
 
-7. **Accede a la aplicación**:
+8. **Accede a la aplicación**:
    Una vez desplegado, Terraform mostrará información relevante, incluyendo la URL de CloudFront para el frontend y el endpoint de API Gateway.
 
 ## Pruebas de la Aplicación
