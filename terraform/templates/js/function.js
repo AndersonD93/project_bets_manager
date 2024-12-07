@@ -109,10 +109,8 @@ export async function fetchScores(UrlApiUpdateResults) {
             throw new Error(`Error: ${response.status} - ${response.statusText}`);
         }
         const responseData = await response.json();
-        console.log("API response:", responseData);
 
         if (Array.isArray(responseData) && responseData.length > 0) {
-            // Accede al primer elemento del array
             const firstItem = responseData[0];
             
             if (firstItem.total_score) {
@@ -134,26 +132,24 @@ export async function fetchScores(UrlApiUpdateResults) {
 
 export function displayScores(score) {
     const tableBody = document.getElementById('scores-table').querySelector('tbody');
-    tableBody.innerHTML = ''; // Limpiar la tabla
+    tableBody.innerHTML = '';
 
-    // Asegúrate de que scores es un arreglo
     if (!Array.isArray(score)) {
         console.error('Se esperaba un arreglo de puntajes');
         return;
     }
 
-    // Usa forEach con un parámetro de índice
     score.forEach((score, index) => {
         const row = document.createElement('tr');
-        const orderCell = document.createElement('td'); // Nueva celda para el orden
+        const orderCell = document.createElement('td');
         const userCell = document.createElement('td');
         const scoreCell = document.createElement('td');
 
-        orderCell.textContent = index + 1; // Asigna el orden (índice + 1)
+        orderCell.textContent = index + 1;
         userCell.textContent = score.user_id;
         scoreCell.textContent = score.total_score;
 
-        row.appendChild(orderCell); // Agrega la celda de orden
+        row.appendChild(orderCell);
         row.appendChild(userCell);
         row.appendChild(scoreCell);
 
@@ -213,12 +209,9 @@ export async function fetchMatches(UrlApiManageMatches) {
         }
 
         const responseData = await response.json();
-        console.log("API response:", responseData);
 
-        // Parsear el cuerpo si viene como string
         const matches = responseData;
 
-        // Verificar si matches es un array
         if (Array.isArray(matches)) {
             matches.forEach(match => {
                 const option = document.createElement('option');

@@ -37,7 +37,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         window.location.href = 'index.html';
     } else {
         console.log('Autenticación Correcta');
-        /*fetchMatches(window.poolDataUrl.UrlApiManageMatches);*/
     }
 });
 
