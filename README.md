@@ -1,150 +1,192 @@
+# Bets Manager — Aplicación Serverless de Apuestas Deportivas
 
-# Aplicación Serverless con AWS y Terraform
-
-¡Bienvenido a este proyecto serverless! Este repositorio contiene una aplicación de apuestas deportivas nativa de la nube construida utilizando servicios de AWS e Infraestructura como Código (IaC) con Terraform. El objetivo de este proyecto es demostrar una arquitectura serverless e invitar a la comunidad a contribuir con ideas y mejoras.
+Aplicación serverless de apuestas deportivas construida sobre AWS con Terraform como IaC y React + Vite como frontend.
 
 ## Tabla de Contenidos
 
 1. [Descripción General](#descripción-general)
 2. [Arquitectura](#arquitectura)
-3. [Requisitos Previos](#requisitos-previos)
-4. [Instrucciones de Configuración](#instrucciones-de-configuración)
-5. [Pruebas de la Aplicación](#pruebas-de-la-aplicación)
-6. [Contribuciones](#contribuciones)
+3. [Stack Tecnológico](#stack-tecnológico)
+4. [Requisitos Previos](#requisitos-previos)
+5. [Instrucciones de Despliegue](#instrucciones-de-despliegue)
+6. [Desarrollo Frontend](#desarrollo-frontend)
+7. [URLs de Acceso](#urls-de-acceso)
+8. [Contribuciones](#contribuciones)
 
 ---
 
 ## Descripción General
 
-Este proyecto demuestra una arquitectura serverless utilizando los servicios de AWS, incluyendo:
+Plataforma que permite a usuarios autenticados apostar en partidos de fútbol. Los administradores gestionan partidos y resultados; los usuarios generales realizan apuestas y consultan el ranking. El sistema calcula puntajes automáticamente vía DynamoDB Streams.
 
-- **AWS Lambda**: Lógica del backend.
-- **API Gateway**: Gestión de API.
-- **DynamoDB**: Almacenamiento de datos.
-- **S3**: Hosting de archivos estáticos.
-- **Cognito**: Servicio para autenticación y autorización de usuarios.
-- **CloudFront**: Red de distribución de contenido (CDN). (Proximo mvp)
-
-Está diseñado para ser implementado fácilmente utilizando Terraform, lo que permite un aprovisionamiento consistente de la infraestructura.
+---
 
 ## Arquitectura
 
 ![Diagrama de Arquitectura](image.png)
 
-La aplicación consiste en un frontend alojado en S3/CloudFront y un backend con API Gateway y Lambda, interactuando con DynamoDB para la persistencia de datos.
-
-## Requisitos Previos
-
-Antes de desplegar el proyecto, asegúrate de tener lo siguiente:
-
-- [Terraform](https://www.terraform.io/downloads.html) instalado.
-- AWS CLI instalado y configurado con los permisos adecuados de IAM.
-- Una cuenta de AWS.
-- Una cuenta en [football-data.org](https://football-data.org/) para obtener un token de API.
-
-## Instrucciones de Configuración
-
-Sigue estos pasos para desplegar el proyecto:
-
-1. **Clona el repositorio**:
-   ```bash
-   git clone https://github.com/AndersonD93/project_bets_manager
-   cd terraform
-   ```
-
-2. **Crea un secreto en AWS Secrets Manager**:
-   Ve a la consola de AWS Secrets Manager y crea un secreto con el nombre `project/footbal-data` que contenga la siguiente estructura:
-   ```json
-   {
-       "X-Auth-Token": "<TU_API_TOKEN>"
-   }
-   ```
-   Reemplaza `<TU_API_TOKEN>` con el token proporcionado por football-data.org.
-
-3. **Crea el archivo `config.js`**:
-   Crea un archivo llamado `config.js` en la carpeta `templates/js` con el siguiente contenido: (Este generara de forma dinamica la url requerida para la obtención de secretos)
-   ```javascript
-   const config = {
-       development: {
-           apiUrlSecrets: "${url_invoke_api}"
-       }
-   };
-
-   const environment = 'development';
-
-   export default config[environment];
-   ```
-4. **Inicializa Terraform usando el backend local**:
-   Comenta el bloque `backend` en el archivo `main.tf` y ejecuta los siguientes comandos para aprovisionar los recursos iniciales:
-   ```bash
-   terraform init
-   terraform plan
-   terraform apply
-   ```
-
-5. **Configura el backend remoto en Terraform(Opcional)**:
-   Descomenta el bloque `backend` en el archivo `main.tf`(Opcional si quieres manejar tu backend en forma remota):
-   ```hcl
-   terraform {
-       backend "s3" {
-           bucket         = "mi-bucket-unico-para-tf-state"
-           key            = "tf-infra/terraform.tfstate"
-           region         = "us-east-1"
-           encrypt        = true
-           dynamodb_table = "terraform-state-locking-ajduran2"
-       }
-   }
-   ```
-   Además, modifica la línea bucket_name dentro del módulo tf-state en main.tf para que coincida con el nombre del bucket configurado:
-
-   ```hcl
-      module "tf-state" {
-      source      = "./modules/tf-state"
-      bucket_name = "mi-bucket-unico-para-tf-state"
-   }
-   ```
-   Luego, vuelve a inicializar y aplica los cambios:
-   ```bash
-   terraform init
-   terraform apply
-   ```
-
-6. **Personaliza las variables**:
-   Actualiza el archivo `variables.tf` o proporciona un archivo `terraform.tfvars` con tu configuración:
-   ```hcl
-   region = "us-east-1"
-   project = "bets-manager"
-   ```
-
-7. **Despliega la infraestructura**:
-   ```bash
-   terraform apply
-   ```
-   Confirma los cambios escribiendo `yes` cuando se te solicite.
-
-8. **Accede a la aplicación**:
-   Una vez desplegado, Terraform mostrará información relevante, incluyendo la URL de CloudFront para el frontend y el endpoint de API Gateway.
-
-## Pruebas de la Aplicación
-
-1. Abre la URL del frontend en tu navegador.
-2. Usa la interfaz para interactuar con la API backend (por ejemplo, enviando solicitudes, viendo respuestas).
-3. También puedes probar la API directamente usando herramientas como Postman o curl.
-
-## Contribuciones
-
-¡Las contribuciones son bienvenidas! Aquí tienes cómo puedes ayudar:
-
-1. **Reporta Problemas**: Usa la pestaña Issues para reportar errores o sugerir funcionalidades.
-2. **Haz un Fork del Repositorio**: Realiza tus cambios y crea un pull request.
-3. **Propón Ideas**: Comparte tus ideas para mejorar el proyecto en la pestaña Discussions.
-
-### Directrices
-
-- Asegúrate de documentar los cambios realizados en el código.
-- Sigue el estilo y la estructura del código existente.
-- Incluye pruebas para cualquier nueva funcionalidad.
+```
+React (S3 + CloudFront HTTPS)
+        │
+        ▼
+API Gateway (REST, REGIONAL)  ←  Cognito Authorizer (JWT)
+        │
+        ▼
+AWS Lambda (Python 3.12)
+        │
+        ▼
+DynamoDB  ←  Streams → recalculate_score Lambda
+        │
+Secrets Manager  ·  Cognito User Pool
+```
 
 ---
 
-¡No dudes en contactarme si tienes preguntas o comentarios! Construyamos algo increíble juntos 🚀.
+## Stack Tecnológico
+
+| Capa | Tecnología |
+|---|---|
+| Frontend | React 18 + Vite 4 + React Router 6 |
+| Auth | AWS Cognito (SRP) + amazon-cognito-identity-js |
+| API | AWS API Gateway REST (Regional) |
+| Backend | AWS Lambda Python 3.12 |
+| Base de datos | AWS DynamoDB (on-demand) |
+| CDN / HTTPS | AWS CloudFront + S3 (OAC) |
+| Secretos | AWS Secrets Manager |
+| IaC | Terraform 1.x |
+| Estado Terraform | S3 + DynamoDB locking |
+
+---
+
+## Requisitos Previos
+
+- [Terraform](https://www.terraform.io/downloads.html) >= 1.0
+- [Node.js](https://nodejs.org/) >= 18
+- AWS CLI configurado con permisos IAM adecuados
+- Cuenta en [football-data.org](https://football-data.org/) para el API token
+
+---
+
+## Instrucciones de Despliegue
+
+### 1. Clonar el repositorio
+
+```bash
+git clone https://github.com/AndersonD93/project_bets_manager
+```
+
+### 2. Crear secreto en Secrets Manager
+
+En la consola AWS crea un secreto llamado `project/footbal-data`:
+
+```json
+{ "X-Auth-Token": "<TU_API_TOKEN>" }
+```
+
+### 3. Build del frontend
+
+```bash
+cd frontend
+npm install
+npm run build
+```
+
+### 4. Inicializar Terraform (backend local primero)
+
+Comenta el bloque `backend "s3"` en `terraform/main.tf` y ejecuta:
+
+```bash
+cd terraform
+terraform init
+terraform apply
+```
+
+### 5. Activar backend remoto (opcional)
+
+Descomenta el bloque `backend "s3"` en `main.tf` y actualiza el `bucket_name` en el módulo `tf-state`. Luego:
+
+```bash
+terraform init
+terraform apply
+```
+
+### 6. Subir frontend a S3
+
+```bash
+aws s3 sync frontend/dist s3://<BUCKET_NAME> --delete --cache-control "no-cache"
+```
+
+### 7. Invalidar caché CloudFront (tras cada deploy)
+
+```bash
+aws cloudfront create-invalidation \
+  --distribution-id <CLOUDFRONT_DISTRIBUTION_ID> \
+  --paths "/*"
+```
+
+---
+
+## Desarrollo Frontend
+
+```bash
+cd frontend
+npm install
+```
+
+Crea un archivo `.env.local` con:
+
+```
+VITE_API_URL=https://i86otm11l7.execute-api.us-east-1.amazonaws.com/prd
+```
+
+Luego:
+
+```bash
+npm run dev
+```
+
+### Estructura del frontend
+
+```
+frontend/
+├── src/
+│   ├── api/          # Llamadas a API Gateway
+│   ├── context/      # AuthContext (Cognito + sesión)
+│   ├── components/   # Navbar, ProtectedRoute
+│   └── pages/        # Login, Admin, Matches, Results, Bets, Scores
+├── .env.production   # VITE_API_URL para build
+└── vite.config.js
+```
+
+### Rutas
+
+| Ruta | Rol | Descripción |
+|---|---|---|
+| `/` | Todos | Login |
+| `/admin` | admin | Crear partido manual |
+| `/matches` | admin | Importar partidos desde football-data.org |
+| `/results` | admin | Actualizar resultado de partido |
+| `/bets` | general | Realizar apuesta |
+| `/scores` | general | Ver ranking de puntajes |
+
+---
+
+## URLs de Acceso
+
+| Recurso | URL |
+|---|---|
+| Frontend (HTTPS) | `https://<CLOUDFRONT_DOMAIN>.cloudfront.net` |
+| Frontend (HTTP) | `http://bets-manager-host-s3-bets-manager.s3-website-us-east-1.amazonaws.com` |
+| API Gateway | `https://i86otm11l7.execute-api.us-east-1.amazonaws.com/prd` |
+
+> La URL exacta de CloudFront se obtiene tras el `terraform apply` con `terraform output cloudfront_url`.
+
+---
+
+## Contribuciones
+
+1. Reporta problemas en la pestaña **Issues**
+2. Haz un fork, crea tu rama y abre un **Pull Request**
+3. Sigue el estilo de código existente y documenta los cambios
+
+¡Las contribuciones son bienvenidas! 🚀

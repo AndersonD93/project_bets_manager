@@ -26,6 +26,16 @@ output "s3_bucket_website_url" {
   value = module.resources.s3_bucket_website_url
 }
 
+output "cloudfront_url" {
+  description = "URL HTTPS del frontend via CloudFront"
+  value       = module.resources.cloudfront_url
+}
+
+output "cloudfront_distribution_id" {
+  description = "ID distribución CloudFront (útil para invalidaciones)"
+  value       = module.resources.cloudfront_distribution_id
+}
+
 output "arn_method" {
   value =module.api_resource_get_secret.method_arn
 }

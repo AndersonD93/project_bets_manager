@@ -4,11 +4,12 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        FRONTEND (S3)                            │
-│  index.html → login.js → Cognito SDK                           │
-│  admin.html / matches.html / results.html / bets.html / score  │
+│              FRONTEND (React + Vite → S3 + CloudFront)          │
+│  / Login  /admin  /matches  /results  /bets  /scores            │
+│  AuthContext → Cognito SDK → JWT en sessionStorage              │
 └────────────────────────┬────────────────────────────────────────┘
-                         │ HTTPS + JWT
+                         │ HTTPS (CloudFront → S3 OAC)
+                         │ + API calls con JWT
 ┌────────────────────────▼────────────────────────────────────────┐
 │                    API GATEWAY (REST, REGIONAL)                  │
 │  Cognito Authorizer (JWT validation)                            │

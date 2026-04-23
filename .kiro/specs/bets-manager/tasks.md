@@ -145,11 +145,29 @@
 - [ ] Generar `config.js` dinámicamente con la URL del endpoint `get_secret`
 - **Archivo**: `terraform/api_gateway.tf`
 
-### TASK-19: S3 Frontend
-- [ ] Crear bucket S3 para hosting estático del frontend
-- [ ] Configurar bucket como sitio web estático
-- [ ] Subir archivos HTML, CSS, JS y `config.js` generado
-- **Archivo**: `terraform/modules/resources/s3.tf`
+### TASK-19: S3 + CloudFront Frontend
+- [x] Crear bucket S3 para hosting del build React
+- [x] Bloquear acceso público al bucket (acceso solo via CloudFront OAC)
+- [x] Crear `aws_cloudfront_origin_access_control` para acceso seguro S3
+- [x] Crear distribución CloudFront con redirect HTTP→HTTPS
+- [x] Configurar fallback SPA (403/404 → index.html con 200)
+- [x] Subir build React con `aws s3 sync frontend/dist s3://...`
+- **Archivos**: `terraform/modules/resources/s3.tf`, `terraform/modules/resources/cloudfront.tf`
+
+### TASK-20: Frontend React + Vite
+- [x] Crear proyecto con `npx create-vite@4 frontend --template react`
+- [x] Instalar `react-router-dom@6` y `amazon-cognito-identity-js@6`
+- [x] `AuthContext` — gestión de sesión Cognito, login, logout, restore session
+- [x] `ProtectedRoute` — redirección por grupo (admin/general)
+- [x] `Navbar` — usuario, grupo, logout
+- [x] Página `Login` — autenticación Cognito SRP
+- [x] Página `Admin` — crear partido manual
+- [x] Página `Matches` — importar partidos desde football-data.org
+- [x] Página `Results` — actualizar resultado de partido
+- [x] Página `Bets` — realizar apuesta
+- [x] Página `Scores` — ranking de puntajes
+- [x] `VITE_API_URL` en `.env.production` apunta al API Gateway
+- **Directorio**: `frontend/`
 
 ---
 

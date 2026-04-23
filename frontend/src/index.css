@@ -1,0 +1,111 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f0f2f5;
+  min-height: 100vh;
+  color: #333;
+}
+
+/* Layout */
+.centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 56px);
+  padding: 24px 16px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+  padding: 32px 28px;
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card.wide { max-width: 640px; }
+
+h2 { text-align: center; font-size: 1.4rem; margin-bottom: 8px; }
+
+/* Inputs */
+input, select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+  transition: border-color .2s;
+}
+input:focus, select:focus { outline: none; border-color: #007bff; }
+
+label { font-size: 13px; font-weight: 600; color: #555; margin-bottom: 2px; display: block; }
+
+.goals-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Buttons */
+.btn {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity .2s;
+}
+.btn:disabled { opacity: .6; cursor: not-allowed; }
+.btn:hover:not(:disabled) { opacity: .88; }
+
+.btn-blue  { background: #007bff; color: #fff; }
+.btn-green { background: #28a745; color: #fff; }
+.btn-red   { background: #dc3545; color: #fff; }
+
+/* Messages */
+.error   { color: #dc3545; font-size: 14px; text-align: center; }
+.success { color: #28a745; font-size: 14px; text-align: center; }
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1a1a2e;
+  color: #fff;
+  padding: 0 24px;
+  height: 56px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.navbar-user { font-size: 14px; }
+.navbar .btn { width: auto; padding: 6px 16px; font-size: 13px; }
+
+.badge {
+  background: #007bff;
+  color: #fff;
+  border-radius: 10px;
+  padding: 2px 8px;
+  font-size: 11px;
+  margin-left: 6px;
+  text-transform: uppercase;
+}
+
+/* Table */
+table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+th, td { padding: 10px 12px; text-align: center; border: 1px solid #e0e0e0; }
+th { background: #007bff; color: #fff; }
+tr:nth-child(even) td { background: #f5f7fa; }
+
+@media (max-width: 480px) {
+  .card { padding: 20px 14px; }
+  .goals-row { grid-template-columns: 1fr; }
+}

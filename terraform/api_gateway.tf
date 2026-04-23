@@ -192,9 +192,4 @@ module "api_resource_update_results" {
   }
 }
 
-resource "local_file" "config_js" {
-  filename = "${path.module}/templates/js/config.js"
-  content  = templatefile("${path.module}/templates/js/config.js", {
-    url_invoke_api = "${module.api_resource_create_update_results.url_invoke_api["create_matches_football_data_post"]}/get_secret"
-  })
-}
+# config.js ya no es necesario — React usa VITE_API_URL en build time

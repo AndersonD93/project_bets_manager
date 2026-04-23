@@ -74,7 +74,14 @@ Aplicación serverless de apuestas deportivas construida sobre AWS con Terraform
 ### REQ-NF-3: Escalabilidad y Disponibilidad
 - Las Lambdas deben ser stateless y usar Python 3.12.
 - DynamoDB debe usar billing on-demand (pay-per-request).
-- El frontend debe estar alojado en S3 con soporte futuro para CloudFront.
+- El frontend debe estar alojado en S3 y distribuido via CloudFront con HTTPS.
+
+### REQ-NF-6: Frontend React
+- El frontend debe estar implementado en React + Vite.
+- El routing debe ser client-side con React Router v6.
+- La autenticación Cognito debe manejarse con `amazon-cognito-identity-js`.
+- El build de producción se genera con `npm run build` y se sube al bucket S3.
+- CloudFront debe redirigir HTTP a HTTPS y servir `index.html` para rutas SPA (403/404 → 200).
 
 ### REQ-NF-4: Observabilidad
 - Las Lambdas deben registrar logs en CloudWatch.
