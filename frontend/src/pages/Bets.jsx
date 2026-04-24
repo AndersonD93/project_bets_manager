@@ -82,6 +82,7 @@ export default function Bets() {
             </button>
           </form>
           <button className="btn btn-green" onClick={() => navigate('/scores')}>Ver Puntajes</button>
+          <button className="btn btn-blue" onClick={() => navigate('/champion')}>🏆 Mi Campeón</button>
         </div>
       </div>
     </>

@@ -45,11 +45,17 @@ module "dynamo_tables_bets_manager" {
         projection_type = "ALL"
       }
       tags = { Project = var.project }
+    },
+    champion_table = {
+      table_name = "champion_picks"
+      hash_key   = "user_id"
+      attributes = [
+        { name = "user_id", type = "S" }
+      ]
+      tags = { Project = var.project }
     }
   }
 }
-
-#DYNAMO PERMISSION
 module "table_permission" {
   source = "./modules/resources/dynamo_table/dynamo_permission"
   mapping_dynamo_permission = {

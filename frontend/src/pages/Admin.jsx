@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { createMatch, getMatches, setMatchStatus } from '../api/matches';
+import { getChampionData, setChampionConfig } from '../api/champion';
 import Navbar from '../components/Navbar';
 
 export default function Admin() {
@@ -13,7 +14,14 @@ export default function Admin() {
   const [msg, setMsg] = useState('');
   const [err, setErr] = useState('');
   const [loading, setLoading] = useState(false);
-  const [loadingStatus, setLoadingStatus] = useState(null); // match_id being toggled
+  const [loadingStatus, setLoadingStatus] = useState(null);
+
+  // Champion config state
+  const [insertBlocked, setInsertBlocked] = useState(false);
+  const [updateBlocked, setUpdateBlocked] = useState(false);
+  const [championMsg, setChampionMsg] = useState('');
+  const [championErr, setChampionErr] = useState('');
+  const [savingChampion, setSavingChampion] = useState(false); // match_id being toggled
 
   // Load all non-finished matches (including blocked) for admin
   useEffect(() => {
@@ -21,6 +29,17 @@ export default function Admin() {
     getMatches(secrets.UrlApiManageMatches, auth.token, true)
       .then(setMatches)
       .catch((e) => setErr(e.message));
+  }, [secrets]);
+
+  // Load champion config
+  useEffect(() => {
+    if (!secrets?.UrlApiChampion) return;
+    getChampionData(secrets.UrlApiChampion, auth.token, '')
+      .then((data) => {
+        setInsertBlocked(data.insert_blocked || false);
+        setUpdateBlocked(data.update_blocked || false);
+      })
+      .catch(() => {});
   }, [secrets]);
 
   async function handleCreateMatch(e) {
@@ -133,6 +152,61 @@ export default function Admin() {
               </tbody>
             </table>
           )}
+        </div>
+
+        {/* Champion config */}
+        <div className="card">
+          <h2>🏆 Control de Campeón del Torneo</h2>
+          {championMsg && <p className="success">{championMsg}</p>}
+          {championErr && <p className="error">{championErr}</p>}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid #eee' }}>
+              <div>
+                <strong>Registro de campeón (insert)</strong>
+                <p style={{ fontSize: 13, color: '#888', margin: '2px 0 0' }}>
+                  {insertBlocked ? '🔒 Bloqueado — los usuarios no pueden registrar su campeón' : '🔓 Activo — los usuarios pueden registrar su campeón'}
+                </p>
+              </div>
+              <button
+                className={`btn btn-sm ${insertBlocked ? 'btn-green' : 'btn-red'}`}
+                disabled={savingChampion}
+                onClick={async () => {
+                  setSavingChampion(true); setChampionMsg(''); setChampionErr('');
+                  try {
+                    await setChampionConfig(secrets.UrlApiChampionConfig, auth.token, { insert_blocked: !insertBlocked, update_blocked: updateBlocked });
+                    setInsertBlocked(!insertBlocked);
+                    setChampionMsg(`✅ Registro ${!insertBlocked ? 'bloqueado' : 'desbloqueado'}`);
+                  } catch (e) { setChampionErr(`❌ ${e.message}`); }
+                  finally { setSavingChampion(false); }
+                }}
+              >
+                {savingChampion ? '...' : insertBlocked ? 'Desbloquear' : 'Bloquear'}
+              </button>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0' }}>
+              <div>
+                <strong>Modificación de campeón (update)</strong>
+                <p style={{ fontSize: 13, color: '#888', margin: '2px 0 0' }}>
+                  {updateBlocked ? '🔒 Bloqueado — los usuarios no pueden cambiar su campeón' : '🔓 Activo — los usuarios pueden cambiar su campeón'}
+                </p>
+              </div>
+              <button
+                className={`btn btn-sm ${updateBlocked ? 'btn-green' : 'btn-red'}`}
+                disabled={savingChampion}
+                onClick={async () => {
+                  setSavingChampion(true); setChampionMsg(''); setChampionErr('');
+                  try {
+                    await setChampionConfig(secrets.UrlApiChampionConfig, auth.token, { insert_blocked: insertBlocked, update_blocked: !updateBlocked });
+                    setUpdateBlocked(!updateBlocked);
+                    setChampionMsg(`✅ Modificación ${!updateBlocked ? 'bloqueada' : 'desbloqueada'}`);
+                  } catch (e) { setChampionErr(`❌ ${e.message}`); }
+                  finally { setSavingChampion(false); }
+                }}
+              >
+                {savingChampion ? '...' : updateBlocked ? 'Desbloquear' : 'Bloquear'}
+              </button>
+            </div>
+          </div>
         </div>
 
       </div>

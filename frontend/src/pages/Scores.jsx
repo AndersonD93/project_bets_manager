@@ -12,6 +12,7 @@ export default function Scores() {
     sessionStorage.setItem('apiUpdateResults', secrets.UrlApiUpdateResults);
     sessionStorage.setItem('apiGetResults',    secrets.UrlApiGetResults    || `${base}/get_results`);
     sessionStorage.setItem('apiGetBets',       secrets.UrlApiGetBets       || `${base}/get_bets`);
+    sessionStorage.setItem('apiChampion',      secrets.UrlApiChampion      || `${base}/champion`);
     sessionStorage.setItem('idToken',          auth.token);
     sessionStorage.setItem('username',         auth.username);
 

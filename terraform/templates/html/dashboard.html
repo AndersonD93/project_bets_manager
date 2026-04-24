@@ -115,14 +115,22 @@
     <div id="bets-table-container" class="loading">Cargando...</div>
   </div>
 
+  <!-- My champion -->
+  <div class="card" id="champion-card" style="display:none">
+    <h2>🏆 Mi Campeón del Mundial 2026</h2>
+    <div id="champion-container" class="loading">Cargando...</div>
+  </div>
+
 </div>
 
 <script>
   const token         = sessionStorage.getItem('idToken');
   const username      = sessionStorage.getItem('username');
-  const apiScores     = sessionStorage.getItem('apiUpdateResults');
-  const apiGetResults = sessionStorage.getItem('apiGetResults');
-  const apiGetBets    = sessionStorage.getItem('apiGetBets');
+  const apiBase       = sessionStorage.getItem('apiBase');
+  const apiScores     = sessionStorage.getItem('apiUpdateResults')    || (apiBase ? apiBase + '/update_results' : null);
+  const apiGetResults = sessionStorage.getItem('apiGetResults')       || (apiBase ? apiBase + '/get_results'    : null);
+  const apiGetBets    = sessionStorage.getItem('apiGetBets')          || (apiBase ? apiBase + '/get_bets'       : null);
+  const apiChampion   = sessionStorage.getItem('apiChampion')         || (apiBase ? apiBase + '/champion'       : null);
 
   if (!token) { window.location.href = '/index.html'; }
 
@@ -218,6 +226,39 @@
     return body;
   }
 
+  // ── Flag map ────────────────────────────────────────────────────────────────
+  const FLAGS = {
+    'Uruguay':'🇺🇾','Germany':'🇩🇪','Spain':'🇪🇸','Paraguay':'🇵🇾','Argentina':'🇦🇷',
+    'Ghana':'🇬🇭','Brazil':'🇧🇷','Portugal':'🇵🇹','Japan':'🇯🇵','Mexico':'🇲🇽',
+    'England':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','USA':'🇺🇸','Korea Republic':'🇰🇷','France':'🇫🇷',
+    'South Africa':'🇿🇦','Algeria':'🇩🇿','Australia':'🇦🇺','New Zealand':'🇳🇿',
+    'Switzerland':'🇨🇭','Ecuador':'🇪🇨','Sweden':'🇸🇪','Czechia':'🇨🇿',
+    'Croatia':'🇭🇷','Saudi Arabia':'🇸🇦','Tunisia':'🇹🇳','Turkey':'🇹🇷',
+    'Senegal':'🇸🇳','Belgium':'🇧🇪','Morocco':'🇲🇦','Austria':'🇦🇹',
+    'Colombia':'🇨🇴','Egypt':'🇪🇬','Canada':'🇨🇦','Haiti':'🇭🇹','Iran':'🇮🇷',
+    'Bosnia-H.':'🇧🇦','Panama':'🇵🇦','Cape Verde':'🇨🇻','Congo DR':'🇨🇩',
+    'Ivory Coast':'🇨🇮','Qatar':'🇶🇦','Jordan':'🇯🇴','Iraq':'🇮🇶',
+    'Uzbekistan':'🇺🇿','Netherlands':'🇳🇱','Norway':'🇳🇴','Scotland':'🏴󠁧󠁢󠁳󠁣󠁴󠁿','Curaçao':'🇨🇼'
+  };
+
+  function renderChampion(data) {
+    const card = document.getElementById('champion-card');
+    const el   = document.getElementById('champion-container');
+    if (!data || !data.champion) {
+      card.style.display = 'block';
+      el.innerHTML = '<p class="loading" style="padding:16px">Aún no has seleccionado tu campeón. <a href="/champion">Seleccionar ahora</a></p>';
+      return;
+    }
+    const flag = FLAGS[data.champion.country] || '🏳️';
+    const date = data.champion.updated_at ? new Date(data.champion.updated_at).toLocaleString('es-CO') : '';
+    card.style.display = 'block';
+    el.innerHTML = '<div style="text-align:center;padding:16px 0">' +
+      '<div style="font-size:4rem">' + flag + '</div>' +
+      '<p style="font-size:1.4rem;font-weight:700;margin:8px 0">' + data.champion.country + '</p>' +
+      (date ? '<p style="font-size:12px;color:#888">Registrado: ' + date + '</p>' : '') +
+      '</div>';
+  }
+
   // ── Load all ────────────────────────────────────────────────────────────────
   async function loadAll() {
     if (!apiScores) {
@@ -266,6 +307,17 @@
       }
     } else {
       document.getElementById('bets-table-container').innerHTML = '<p class="loading">URL de apuestas no disponible.</p>';
+    }
+
+    // Champion
+    if (apiChampion && username) {
+      try {
+        const raw = await fetchJSON(apiChampion + '?user_id=' + encodeURIComponent(username));
+        renderChampion(raw);
+      } catch (e) {
+        document.getElementById('champion-card').style.display = 'block';
+        document.getElementById('champion-container').innerHTML = '<p class="error-msg">Error campeón: ' + e.message + '</p>';
+      }
     }
   }
 

@@ -7,6 +7,7 @@ import Matches from './pages/Matches';
 import Results from './pages/Results';
 import Bets from './pages/Bets';
 import Scores from './pages/Scores';
+import Champion from './pages/Champion';
 
 export default function App() {
   return (
@@ -32,6 +33,9 @@ export default function App() {
           } />
           <Route path="/scores" element={
             <ProtectedRoute allowedGroup="general"><Scores /></ProtectedRoute>
+          } />
+          <Route path="/champion" element={
+            <ProtectedRoute allowedGroup="general"><Champion /></ProtectedRoute>
           } />
 
           <Route path="*" element={<Navigate to="/" replace />} />

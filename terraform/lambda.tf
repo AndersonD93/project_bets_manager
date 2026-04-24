@@ -98,6 +98,28 @@ module "lambdas_backend_api" {
         "bets_users_table" = module.dynamo_tables_bets_manager.dynamo_table_name["bets_users_table"]
         "matches_table"    = module.dynamo_tables_bets_manager.dynamo_table_name["matches_table"]
       }
+    },
+    put_champion = {
+      lambda_name = "put_champion"
+      handler     = "put_champion.lambda_handler"
+      runtime     = "python3.12"
+      environment_variables = {
+        "champion_table" = module.dynamo_tables_bets_manager.dynamo_table_name["champion_table"]
+      }
+    },
+    get_champion = {
+      lambda_name = "get_champion"
+      handler     = "get_champion.lambda_handler"
+      runtime     = "python3.12"
+      environment_variables = {
+        "champion_table" = module.dynamo_tables_bets_manager.dynamo_table_name["champion_table"]
+      }
+    },
+    manage_champion_config = {
+      lambda_name = "manage_champion_config"
+      handler     = "manage_champion_config.lambda_handler"
+      runtime     = "python3.12"
+      environment_variables = {}
     }
   }
 }
@@ -153,6 +175,21 @@ module "lambda_permission_api" {
     get_bets = {
       lambda_name = module.lambdas_backend_api.lambda_name["get_bets"]
       source_arn  = module.api_resource_get_bets.method_arn["get_bets_get"]
+      principal   = "apigateway.amazonaws.com"
+    },
+    put_champion = {
+      lambda_name = module.lambdas_backend_api.lambda_name["put_champion"]
+      source_arn  = module.api_resource_champion.method_arn["champion_post"]
+      principal   = "apigateway.amazonaws.com"
+    },
+    get_champion = {
+      lambda_name = module.lambdas_backend_api.lambda_name["get_champion"]
+      source_arn  = module.api_resource_champion.method_arn["champion_get"]
+      principal   = "apigateway.amazonaws.com"
+    },
+    manage_champion_config = {
+      lambda_name = module.lambdas_backend_api.lambda_name["manage_champion_config"]
+      source_arn  = module.api_resource_champion_config.method_arn["champion_config_post"]
       principal   = "apigateway.amazonaws.com"
     }
   }
