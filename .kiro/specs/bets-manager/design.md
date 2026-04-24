@@ -97,8 +97,8 @@ terraform/
 |------------|------|------------------------------------|
 | match_id   | S    | PK - Identificador único del partido |
 | teams      | S    | Nombre de los equipos              |
-| match_date | S    | Fecha del partido                  |
-| status     | S    | `SCHEDULED` \| `FINISHED`          |
+| match_date | S    | Fecha y hora del partido (ISO 8601) |
+| status     | S    | `SCHEDULED` \| `BLOCKED` \| `FINISHED` |
 | updated_at | S    | Timestamp de última actualización  |
 
 ### `results_table` (Stream habilitado: NEW_AND_OLD_IMAGES)

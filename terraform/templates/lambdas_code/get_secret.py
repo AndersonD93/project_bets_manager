@@ -2,42 +2,32 @@ import json
 import boto3
 import os
 
+CORS_HEADERS = {
+    'Access-Control-Allow-Origin': 'https://d3iqu3owmhprm.cloudfront.net',
+    'Content-Type': 'application/json'
+}
+
 
 def lambda_handler(event, context):
     secrets_manager = boto3.client('secretsmanager')
-    
+
     try:
-        # Recupera el secreto desde Secrets Manager
         response = secrets_manager.get_secret_value(
             SecretId=os.getenv('secret_name'), VersionStage='AWSCURRENT')
-        # Parsea el valor del secreto
         secret_data = json.loads(response['SecretString'])
-        
+
+        # Return all keys except sensitive ones
+        safe_keys = {k: v for k, v in secret_data.items() if k != 'X-Auth-Token'}
+
         return {
             'statusCode': 200,
-            'headers': {
-                'Access-Control-Allow-Origin': 'https://d3iqu3owmhprm.cloudfront.net',
-                'Content-Type': 'application/json'
-            },
-            'body': json.dumps({
-                'UserPoolId': secret_data['UserPoolId'],
-                'ClientId': secret_data['ClientId'],
-                'UrlApiManageMatches': secret_data['UrlApiManageMatches'],
-                'UrlApiUpdateResults': secret_data['UrlApiUpdateResults'],
-                'UrlApiPutBets': secret_data['UrlApiPutBets'],
-                'X-Auth-Token': secret_data['X-Auth-Token'],
-                'UrlApiCreateMatchesForAPiFootballData':
-                    secret_data['UrlApiCreateMatchesForAPiFootballData']
-            })
+            'headers': CORS_HEADERS,
+            'body': json.dumps(safe_keys)
         }
-    
+
     except Exception as e:
         return {
             'statusCode': 500,
-            'headers': {
-                'Access-Control-Allow-Origin': 'https://d3iqu3owmhprm.cloudfront.net',
-                'Content-Type': 'application/json'
-            },
+            'headers': CORS_HEADERS,
             'body': json.dumps({'error': str(e)})
         }
-

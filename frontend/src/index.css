@@ -109,3 +109,26 @@ tr:nth-child(even) td { background: #f5f7fa; }
   .card { padding: 20px 14px; }
   .goals-row { grid-template-columns: 1fr; }
 }
+
+/* Page container for multi-card layouts */
+.page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 24px 16px;
+  min-height: calc(100vh - 56px);
+}
+
+/* Status badges */
+.badge-green { background: #28a745; }
+.badge-red   { background: #dc3545; }
+.badge-gray  { background: #6c757d; }
+
+/* Small button variant */
+.btn-sm {
+  width: auto;
+  padding: 5px 12px;
+  font-size: 13px;
+  border-radius: 4px;
+}

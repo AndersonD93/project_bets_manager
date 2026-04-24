@@ -31,10 +31,19 @@ Aplicación serverless de apuestas deportivas construida sobre AWS con Terraform
 
 ### REQ-3: Apuestas (General)
 
-- **REQ-3.1**: Un usuario general debe poder ver la lista de partidos con estado distinto a `FINISHED`.
+- **REQ-3.1**: Un usuario general debe poder ver la lista de partidos con estado distinto a `FINISHED` y distinto a `BLOCKED`.
 - **REQ-3.2**: Un usuario debe poder apostar el resultado de un partido (`home_win`, `away_win`, `draw`) y el marcador exacto (goles local y visitante).
 - **REQ-3.3**: La apuesta debe registrarse en DynamoDB con `user_id`, `match_id`, `bet_result`, `exact_score` y `timestamp`.
 - **REQ-3.4**: Una apuesta no modificada debe marcarse con `modified: false`.
+- **REQ-3.5**: El sistema debe rechazar apuestas si el partido inicia en menos de 1 hora (basado en `match_date` de `matches_table`).
+- **REQ-3.6**: El sistema debe rechazar apuestas si el partido tiene estado `BLOCKED`.
+
+### REQ-7: Bloqueo de Apuestas (Admin)
+
+- **REQ-7.1**: Un admin debe poder bloquear manualmente las apuestas de un partido desde el panel de administración.
+- **REQ-7.2**: Al bloquear un partido, su estado debe cambiar a `BLOCKED` en `matches_table`.
+- **REQ-7.3**: Un partido bloqueado no debe aparecer en la lista de partidos disponibles para apostar.
+- **REQ-7.4**: Un admin debe poder desbloquear un partido (volver a estado `SCHEDULED`).
 
 ### REQ-4: Actualización de Resultados (Admin)
 

@@ -9,7 +9,7 @@ module "api_bets_manager" {
   name_api        = "api_bets_manager_moduls"
   description_api = "api para gestionar peticiones para backends logica de aplicación"
   type_endpoint   = "REGIONAL"
-  path_part_list  = ["put_bets", "get_secret", "manage_matches", "create-matches-football-data", "update_results"]
+  path_part_list  = ["put_bets", "get_secret", "manage_matches", "create-matches-football-data", "update_results", "manage_match_status"]
 }
 
 resource "aws_api_gateway_authorizer" "cognito_authorizer_module" {
@@ -197,3 +197,34 @@ module "api_resource_update_results" {
 }
 
 # config.js ya no es necesario — React usa VITE_API_URL en build time
+
+module "api_resource_manage_match_status" {
+  source               = "./modules/resources/api_gateway/api_resources"
+  api_id               = module.api_bets_manager.api_id
+  api_root_resource_id = module.api_bets_manager.api_root_resource_id
+
+  api_resources = {
+    "manage_match_status_options" = {
+      resource_id          = module.api_bets_manager.api_resource_ids["manage_match_status"]
+      http_method          = "OPTIONS"
+      authorization        = "NONE"
+      type_integration     = "MOCK"
+      request_templates    = { "application/json" = "{\"statusCode\": 200}" }
+      passthrough_behavior = "WHEN_NO_MATCH"
+      response_models      = { "application/json" = "Empty" }
+      stage_name           = "prd"
+      url_cors_allow       = local.cloudfront_origin
+    },
+    "manage_match_status_post" = {
+      resource_id      = module.api_bets_manager.api_resource_ids["manage_match_status"]
+      http_method      = "POST"
+      authorization    = "COGNITO_USER_POOLS"
+      authorizer_id    = aws_api_gateway_authorizer.cognito_authorizer_module.id
+      type_integration = "AWS_PROXY"
+      uri              = module.lambdas_backend_api.invoke_arn["manage_match_status"]
+      response_models  = { "application/json" = "Empty" }
+      stage_name       = "prd"
+      url_cors_allow   = local.cloudfront_origin
+    }
+  }
+}

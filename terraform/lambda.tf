@@ -43,6 +43,7 @@ module "lambdas_backend_api" {
       runtime     = "python3.12"
       environment_variables = {
         "bets_users_table" = module.dynamo_tables_bets_manager.dynamo_table_name["bets_users_table"]
+        "matches_table"    = module.dynamo_tables_bets_manager.dynamo_table_name["matches_table"]
       }
     },
     recalculate_score = {
@@ -70,6 +71,14 @@ module "lambdas_backend_api" {
       runtime     = "python3.12"
       environment_variables = {
         "score_user_table" = module.dynamo_tables_bets_manager.dynamo_table_name["score_user_table"]
+      }
+    },
+    manage_match_status = {
+      lambda_name = "manage_match_status"
+      handler     = "manage_match_status.lambda_handler"
+      runtime     = "python3.12"
+      environment_variables = {
+        "matches_table" = module.dynamo_tables_bets_manager.dynamo_table_name["matches_table"]
       }
     }
   }
@@ -111,6 +120,11 @@ module "lambda_permission_api" {
     get_scores = {
       lambda_name = module.lambdas_backend_api.lambda_name["get_scores"]
       source_arn  = module.api_resource_update_results.method_arn["update_results_get"]
+      principal   = "apigateway.amazonaws.com"
+    },
+    manage_match_status = {
+      lambda_name = module.lambdas_backend_api.lambda_name["manage_match_status"]
+      source_arn  = module.api_resource_manage_match_status.method_arn["manage_match_status_post"]
       principal   = "apigateway.amazonaws.com"
     }
   }
