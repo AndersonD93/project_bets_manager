@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Bets Manager</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #333; min-height: 100vh; }
+
+    .navbar {
+      background: #1a1a2e; color: #fff;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0 24px; height: 56px; position: sticky; top: 0; z-index: 100;
+    }
+    .navbar h1 { font-size: 1.1rem; }
+    .navbar-right { display: flex; align-items: center; gap: 12px; }
+    .badge { background: #007bff; color: #fff; border-radius: 10px; padding: 2px 8px; font-size: 11px; margin-left: 6px; text-transform: uppercase; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 28px 16px; display: flex; flex-direction: column; gap: 28px; }
+
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; }
+    .stat-box { background: #fff; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); padding: 20px; text-align: center; }
+    .stat-value { font-size: 2rem; font-weight: 700; color: #007bff; }
+    .stat-label { font-size: 12px; color: #888; margin-top: 4px; }
+
+    .card { background: #fff; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); padding: 28px; }
+    .card h2 { font-size: 1.15rem; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+
+    .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .last-updated { font-size: 12px; color: #999; }
+
+    .chart-wrapper { position: relative; height: 320px; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 11px 14px; text-align: left; border-bottom: 1px solid #e8e8e8; font-size: 14px; }
+    th { background: #f8f9fa; font-weight: 600; color: #555; }
+    tr:hover td { background: #f5f7ff; }
+
+    .rank-1 td:first-child { color: #f5a623; font-weight: 700; font-size: 1.1rem; }
+    .rank-2 td:first-child { color: #9b9b9b; font-weight: 700; }
+    .rank-3 td:first-child { color: #c47c2b; font-weight: 700; }
+
+    .score-pill { display: inline-block; background: #007bff; color: #fff; border-radius: 12px; padding: 2px 12px; font-weight: 600; font-size: 13px; }
+
+    .result-home { color: #28a745; font-weight: 600; }
+    .result-away { color: #dc3545; font-weight: 600; }
+    .result-draw { color: #f5a623; font-weight: 600; }
+
+    .btn { padding: 8px 18px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity .2s; }
+    .btn:hover { opacity: .85; }
+    .btn-blue  { background: #007bff; color: #fff; }
+    .btn-red   { background: #dc3545; color: #fff; }
+    .btn-green { background: #28a745; color: #fff; }
+
+    .loading   { text-align: center; color: #888; padding: 32px; }
+    .error-msg { color: #dc3545; text-align: center; padding: 16px; }
+
+    @media (max-width: 600px) {
+      .chart-wrapper { height: 220px; }
+      th, td { padding: 8px 10px; font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <h1>🏆 Bets Manager — Dashboard</h1>
+  <div class="navbar-right">
+    <span id="nav-user"></span>
+    <button class="btn btn-green" onclick="window.location.href='/index.html'">← Volver</button>
+    <button class="btn btn-red" onclick="logout()">Logout</button>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-box"><div class="stat-value" id="stat-players">—</div><div class="stat-label">Jugadores</div></div>
+    <div class="stat-box"><div class="stat-value" id="stat-bets">—</div><div class="stat-label">Apuestas</div></div>
+    <div class="stat-box"><div class="stat-value" id="stat-results">—</div><div class="stat-label">Resultados</div></div>
+    <div class="stat-box"><div class="stat-value" id="stat-leader" style="font-size:1.2rem">—</div><div class="stat-label">Líder</div></div>
+    <div class="stat-box"><div class="stat-value" id="stat-top-score">—</div><div class="stat-label">Puntaje Máximo</div></div>
+  </div>
+
+  <!-- Chart -->
+  <div class="card">
+    <div class="toolbar">
+      <h2>📊 Ranking de Puntajes</h2>
+      <div style="display:flex;gap:10px;align-items:center">
+        <span class="last-updated" id="scores-updated"></span>
+        <button class="btn btn-blue" onclick="loadAll()">↻ Actualizar</button>
+      </div>
+    </div>
+    <div class="chart-wrapper"><canvas id="scoresChart"></canvas></div>
+  </div>
+
+  <!-- Ranking table -->
+  <div class="card">
+    <h2>🥇 Tabla de Posiciones</h2>
+    <div id="scores-table-container" class="loading">Cargando...</div>
+  </div>
+
+  <!-- Results table -->
+  <div class="card">
+    <h2>📋 Resultados Registrados</h2>
+    <div id="results-table-container" class="loading">Cargando...</div>
+  </div>
+
+  <!-- Bets table -->
+  <div class="card">
+    <h2>🎯 Apuestas Realizadas</h2>
+    <div id="bets-table-container" class="loading">Cargando...</div>
+  </div>
+
+</div>
+
+<script>
+  const token         = sessionStorage.getItem('idToken');
+  const username      = sessionStorage.getItem('username');
+  const apiScores     = sessionStorage.getItem('apiUpdateResults');
+  const apiGetResults = sessionStorage.getItem('apiGetResults');
+  const apiGetBets    = sessionStorage.getItem('apiGetBets');
+
+  if (!token) { window.location.href = '/index.html'; }
+
+  document.getElementById('nav-user').innerHTML =
+    '👤 ' + (username || '') + ' <span class="badge">general</span>';
+
+  function logout() {
+    sessionStorage.clear();
+    window.location.href = '/index.html';
+  }
+
+  // ── Chart ───────────────────────────────────────────────────────────────────
+  let chartInstance = null;
+
+  function renderChart(scores) {
+    const ctx = document.getElementById('scoresChart').getContext('2d');
+    const colors = scores.map((_, i) =>
+      i === 0 ? '#f5a623' : i === 1 ? '#9b9b9b' : i === 2 ? '#c47c2b' : '#4a90d9');
+    if (chartInstance) chartInstance.destroy();
+    chartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: scores.map(s => s.user_id),
+        datasets: [{ label: 'Puntaje', data: scores.map(s => s.total_score),
+          backgroundColor: colors, borderRadius: 6, borderSkipped: false }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ' ' + c.parsed.y + ' pts' } } },
+        scales: {
+          y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f0f0f0' } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  // ── Scores table ────────────────────────────────────────────────────────────
+  function renderScoresTable(scores) {
+    const el = document.getElementById('scores-table-container');
+    if (!scores.length) { el.innerHTML = '<p class="loading">No hay puntajes aún.</p>'; return; }
+    const rows = scores.map((s, i) => {
+      const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
+      return '<tr class="' + (i < 3 ? 'rank-' + (i + 1) : '') + '">' +
+        '<td>' + medal + '</td>' +
+        '<td>' + s.user_id + '</td>' +
+        '<td><span class="score-pill">' + s.total_score + ' pts</span></td></tr>';
+    }).join('');
+    el.innerHTML = '<table><thead><tr><th>#</th><th>Usuario</th><th>Puntaje Total</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  }
+
+  // ── Results table ───────────────────────────────────────────────────────────
+  function renderResultsTable(results) {
+    const el = document.getElementById('results-table-container');
+    if (!results.length) { el.innerHTML = '<p class="loading">No hay resultados registrados aún.</p>'; return; }
+    const labelMap = { home_win: 'Gana Local', away_win: 'Gana Visitante', draw: 'Empate' };
+    const classMap = { home_win: 'result-home', away_win: 'result-away', draw: 'result-draw' };
+    const rows = results.map(r =>
+      '<tr>' +
+      '<td>' + (r.teams || r.match_id) + '</td>' +
+      '<td><span class="' + (classMap[r.real_result] || '') + '">' + (labelMap[r.real_result] || r.real_result) + '</span></td>' +
+      '<td><strong>' + r.exact_score + '</strong></td>' +
+      '<td>' + (r.updated_at ? new Date(r.updated_at).toLocaleString('es-CO') : '—') + '</td>' +
+      '</tr>'
+    ).join('');
+    el.innerHTML = '<table><thead><tr><th>Partido</th><th>Resultado</th><th>Marcador</th><th>Registrado</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  }
+
+  // ── Bets table ──────────────────────────────────────────────────────────────
+  function renderBetsTable(bets) {
+    const el = document.getElementById('bets-table-container');
+    if (!bets.length) { el.innerHTML = '<p class="loading">No hay apuestas registradas aún.</p>'; return; }
+    const labelMap = { home_win: 'Gana Local', away_win: 'Gana Visitante', draw: 'Empate' };
+    const classMap = { home_win: 'result-home', away_win: 'result-away', draw: 'result-draw' };
+    const rows = bets.map(b =>
+      '<tr>' +
+      '<td><strong>' + b.user_id + '</strong></td>' +
+      '<td>' + (b.teams || b.match_id) + '</td>' +
+      '<td><span class="' + (classMap[b.bet_result] || '') + '">' + (labelMap[b.bet_result] || b.bet_result) + '</span></td>' +
+      '<td><strong>' + b.exact_score + '</strong></td>' +
+      '<td>' + (b.timestamp ? new Date(b.timestamp).toLocaleString('es-CO') : '—') + '</td>' +
+      '</tr>'
+    ).join('');
+    el.innerHTML = '<table><thead><tr><th>Jugador</th><th>Partido</th><th>Resultado Apostado</th><th>Marcador</th><th>Hora Registro</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  }
+
+  // ── Fetch helper ────────────────────────────────────────────────────────────
+  async function fetchJSON(url) {
+    const res = await fetch(url, { headers: { Authorization: token, 'Content-Type': 'application/json' } });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const body = typeof data.body === 'string' ? JSON.parse(data.body) : (data.body != null ? data.body : data);
+    return body;
+  }
+
+  // ── Load all ────────────────────────────────────────────────────────────────
+  async function loadAll() {
+    if (!apiScores) {
+      document.getElementById('scores-table-container').innerHTML =
+        '<p class="error-msg">No se encontró la URL de la API. <a href="/index.html">Volver al inicio</a></p>';
+      return;
+    }
+
+    // Scores
+    try {
+      const raw = await fetchJSON(apiScores);
+      const sorted = (Array.isArray(raw) ? raw : []).sort((a, b) => b.total_score - a.total_score);
+      renderChart(sorted);
+      renderScoresTable(sorted);
+      document.getElementById('stat-players').textContent = sorted.length;
+      if (sorted.length) {
+        document.getElementById('stat-leader').textContent = sorted[0].user_id;
+        document.getElementById('stat-top-score').textContent = sorted[0].total_score + ' pts';
+      }
+      document.getElementById('scores-updated').textContent = 'Actualizado: ' + new Date().toLocaleTimeString('es-CO');
+    } catch (e) {
+      document.getElementById('scores-table-container').innerHTML = '<p class="error-msg">Error puntajes: ' + e.message + '</p>';
+    }
+
+    // Results
+    if (apiGetResults) {
+      try {
+        const raw = await fetchJSON(apiGetResults);
+        const results = Array.isArray(raw) ? raw : [];
+        document.getElementById('stat-results').textContent = results.length;
+        renderResultsTable(results);
+      } catch (e) {
+        document.getElementById('results-table-container').innerHTML = '<p class="error-msg">Error resultados: ' + e.message + '</p>';
+      }
+    }
+
+    // Bets
+    if (apiGetBets) {
+      try {
+        const raw = await fetchJSON(apiGetBets);
+        const bets = Array.isArray(raw) ? raw : [];
+        document.getElementById('stat-bets').textContent = bets.length;
+        renderBetsTable(bets);
+      } catch (e) {
+        document.getElementById('bets-table-container').innerHTML = '<p class="error-msg">Error apuestas: ' + e.message + '</p>';
+      }
+    } else {
+      document.getElementById('bets-table-container').innerHTML = '<p class="loading">URL de apuestas no disponible.</p>';
+    }
+  }
+
+  loadAll();
+</script>
+</body>
+</html>
