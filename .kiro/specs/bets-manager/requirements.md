@@ -38,6 +38,13 @@ Aplicación serverless de apuestas deportivas construida sobre AWS con Terraform
 - **REQ-3.5**: El sistema debe rechazar apuestas si el partido inicia en menos de 1 hora (basado en `match_date` de `matches_table`).
 - **REQ-3.6**: El sistema debe rechazar apuestas si el partido tiene estado `BLOCKED`.
 
+### REQ-7: Bloqueo de Apuestas por Partido (Admin)
+
+- **REQ-7.1**: Un admin debe poder bloquear manualmente las apuestas de un partido desde el panel de administración.
+- **REQ-7.2**: Al bloquear un partido, su estado debe cambiar a `BLOCKED` en `matches_table`.
+- **REQ-7.3**: Un partido bloqueado no debe aparecer en la lista de partidos disponibles para apostar.
+- **REQ-7.4**: Un admin debe poder desbloquear un partido (volver a estado `SCHEDULED`).
+
 ### REQ-8: Campeón del Torneo (General)
 
 - **REQ-8.1**: Un usuario general debe poder seleccionar un país como su campeón del torneo desde un dropdown poblado desde SSM Parameter Store.
@@ -51,11 +58,6 @@ Aplicación serverless de apuestas deportivas construida sobre AWS con Terraform
 - **REQ-9.1**: El admin debe poder bloquear/desbloquear la creación de campeón (insert) para todos los usuarios.
 - **REQ-9.2**: El admin debe poder bloquear/desbloquear la modificación de campeón (update) para todos los usuarios.
 - **REQ-9.3**: Los controles de bloqueo deben estar en el panel de administración.
-
-- **REQ-7.1**: Un admin debe poder bloquear manualmente las apuestas de un partido desde el panel de administración.
-- **REQ-7.2**: Al bloquear un partido, su estado debe cambiar a `BLOCKED` en `matches_table`.
-- **REQ-7.3**: Un partido bloqueado no debe aparecer en la lista de partidos disponibles para apostar.
-- **REQ-7.4**: Un admin debe poder desbloquear un partido (volver a estado `SCHEDULED`).
 
 ### REQ-4: Actualización de Resultados (Admin)
 

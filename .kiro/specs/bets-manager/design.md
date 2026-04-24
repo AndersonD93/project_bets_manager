@@ -5,7 +5,7 @@
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │              FRONTEND (React + Vite → S3 + CloudFront)          │
-│  / Login  /admin  /matches  /results  /bets  /scores            │
+│  / Login  /admin  /matches  /results  /bets  /scores /champion  │
 │  AuthContext → Cognito SDK → JWT en sessionStorage              │
 └────────────────────────┬────────────────────────────────────────┘
                          │ HTTPS (CloudFront → S3 OAC)
@@ -15,6 +15,8 @@
 │  Cognito Authorizer (JWT validation)                            │
 │  /get_secret (public) │ /put_bets │ /manage_matches             │
 │  /update_results      │ /create-matches-football-data           │
+│  /manage_match_status │ /get_results │ /get_bets                │
+│  /champion            │ /champion-config                        │
 └────────────────────────┬────────────────────────────────────────┘
                          │ AWS_PROXY
 ┌────────────────────────▼────────────────────────────────────────┐
@@ -22,15 +24,18 @@
 │  get_secret │ put_bets │ manage_matches │ get_matches           │
 │  update_results │ get_scores │ create_matches_for_futbol_data   │
 │  recalculate_score (DynamoDB Stream trigger)                    │
+│  manage_match_status │ get_results │ get_bets                   │
+│  get_champion │ put_champion │ manage_champion_config           │
 └──────┬──────────────────────────────────────────────────────────┘
        │
 ┌──────▼──────────────────────────────────────────────────────────┐
 │                        DYNAMODB                                  │
 │  matches_table │ results_table (Stream) │ bets_users │ score_user│
+│  champion_picks                                                  │
 └─────────────────────────────────────────────────────────────────┘
        │
 ┌──────▼──────────────────────────────────────────────────────────┐
-│              SECRETS MANAGER + COGNITO + IAM                    │
+│     SECRETS MANAGER + COGNITO + IAM + SSM PARAMETER STORE      │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -128,9 +133,22 @@ terraform/
 | user_id     | S    | PK - ID del usuario            |
 | total_score | N    | Puntaje acumulado total        |
 
+### `champion_picks`
+| Atributo   | Tipo | Descripción                        |
+|------------|------|------------------------------------|
+| user_id    | S    | PK - ID del usuario                |
+| country    | S    | País seleccionado como campeón     |
+| updated_at | S    | Timestamp de registro/modificación |
+
 ---
 
-## Flujo de Datos
+## SSM Parameter Store
+
+| Parámetro | Tipo | Descripción |
+|-----------|------|-------------|
+| `/bets-manager/world-cup-2026/countries` | StringList | 48 países del Mundial 2026 |
+| `/bets-manager/champion/insert-blocked` | String | `true`/`false` — bloqueo de creación |
+| `/bets-manager/champion/update-blocked` | String | `true`/`false` — bloqueo de modificación |
 
 ### Flujo de Login
 ```
@@ -176,6 +194,12 @@ terraform/
 | POST   | /create-matches-football-data     | COGNITO       | create_matches_for_futbol_data  |
 | GET    | /update_results                   | COGNITO       | get_scores                      |
 | POST   | /update_results                   | COGNITO       | update_results                  |
+| POST   | /manage_match_status              | COGNITO       | manage_match_status             |
+| GET    | /get_results                      | COGNITO       | get_results                     |
+| GET    | /get_bets                         | COGNITO       | get_bets                        |
+| GET    | /champion                         | COGNITO       | get_champion                    |
+| POST   | /champion                         | COGNITO       | put_champion                    |
+| POST   | /champion-config                  | COGNITO       | manage_champion_config          |
 | OPTIONS| todos los anteriores              | NONE          | MOCK (CORS preflight)           |
 
 ---
@@ -201,12 +225,14 @@ terraform/
 
 | Página         | Rol     | Funcionalidad                                      |
 |----------------|---------|----------------------------------------------------|
-| index.html     | Todos   | Login + navegación post-login según grupo          |
-| admin.html     | Admin   | Crear partido manual (match_id, teams, date)       |
-| matches.html   | Admin   | Importar partidos desde football-data.org          |
-| results.html   | Admin   | Actualizar resultado real de un partido            |
-| bets.html      | General | Seleccionar partido y realizar apuesta             |
-| score.html     | General | Ver ranking de puntajes ordenado                   |
+| `/`            | Todos   | Login + navegación post-login según grupo          |
+| `/admin`       | Admin   | Crear partido, gestionar bloqueos, control campeón |
+| `/matches`     | Admin   | Importar partidos desde football-data.org          |
+| `/results`     | Admin   | Actualizar resultado real de un partido            |
+| `/bets`        | General | Seleccionar partido y realizar apuesta             |
+| `/scores`      | General | Redirige al dashboard HTML en S3                   |
+| `/champion`    | General | Seleccionar campeón del torneo                     |
+| `/html/dashboard.html` | General | Dashboard: ranking, resultados, apuestas, campeón |
 
 ### Configuración Dinámica
 El archivo `config.js` es generado por Terraform con la URL del endpoint `get_secret`. El frontend lo usa para obtener en runtime todos los demás endpoints y credenciales de Cognito.
