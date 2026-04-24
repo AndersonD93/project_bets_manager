@@ -32,7 +32,7 @@ def lambda_handler(event, context):
                 'statusCode': 200,
                 'body': json.dumps({'message': 'No se encontraron puntajes.'}),
                 'headers': {
-                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Origin": "https://d3iqu3owmhprm.cloudfront.net",
                     "Content-Type": "application/json",
                     "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
                     "Access-Control-Allow-Headers": "Content-Type, Authorization"
@@ -50,7 +50,7 @@ def lambda_handler(event, context):
             'statusCode': 200,
             'body': json.dumps(sorted_items),
             'headers': {
-                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Origin": "https://d3iqu3owmhprm.cloudfront.net",
                     "Content-Type": "application/json",
                     "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
                     "Access-Control-Allow-Headers": "Content-Type, Authorization"
@@ -63,9 +63,10 @@ def lambda_handler(event, context):
             'statusCode': 500,
             'body': json.dumps({'message': f"Error interno al obtener los puntajes: {str(e)}"}),
             'headers': {
-                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Origin": "https://d3iqu3owmhprm.cloudfront.net",
                     "Content-Type": "application/json",
                     "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
                     "Access-Control-Allow-Headers": "Content-Type, Authorization"
                 },
         }
+

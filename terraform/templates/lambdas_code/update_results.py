@@ -16,7 +16,7 @@ def lambda_handler(event, context):
         return {
             "statusCode": 400,
             'headers': {
-                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Origin": "https://d3iqu3owmhprm.cloudfront.net",
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
                 "Access-Control-Allow-Headers": "Content-Type, Authorization"
@@ -31,7 +31,7 @@ def lambda_handler(event, context):
         return {
             "statusCode": 400,
             'headers': {
-                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Origin": "https://d3iqu3owmhprm.cloudfront.net",
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
                 "Access-Control-Allow-Headers": "Content-Type, Authorization"
@@ -66,7 +66,7 @@ def lambda_handler(event, context):
         return {
             'statusCode': 200,
             'headers': {
-                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Origin": "https://d3iqu3owmhprm.cloudfront.net",
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
                 "Access-Control-Allow-Headers": "Content-Type, Authorization"
@@ -78,10 +78,11 @@ def lambda_handler(event, context):
         return {
             'statusCode': 400,
             'headers': {
-                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Origin": "https://d3iqu3owmhprm.cloudfront.net",
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
                 "Access-Control-Allow-Headers": "Content-Type, Authorization"
             },
             'body': json.dumps(f"Error: {str(e)}")
         }
+

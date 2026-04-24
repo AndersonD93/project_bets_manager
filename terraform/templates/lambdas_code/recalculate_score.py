@@ -85,3 +85,4 @@ def lambda_handler(event, context):
             'statusCode': 400,
             'body': json.dumps(f"Error: Key {str(e)} not found in event.")
         }
+

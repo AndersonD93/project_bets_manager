@@ -64,7 +64,7 @@ def add_cors_headers(response):
     Añade los encabezados necesarios para evitar errores de CORS.
     """
     response['headers'] = {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": "https://d3iqu3owmhprm.cloudfront.net",
         "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, Authorization"
     }
@@ -134,3 +134,4 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'body': json.dumps({"message": f"Successfully saved {len(matches)} matches to DynamoDB"})
     })
+

@@ -1,5 +1,9 @@
 #API GATEWAY
 
+locals {
+  cloudfront_origin = "'https://d3iqu3owmhprm.cloudfront.net'"
+}
+
 module "api_bets_manager" {
   source          = "./modules/resources/api_gateway"
   name_api        = "api_bets_manager_moduls"
@@ -31,7 +35,7 @@ module "api_resource_put_bets" {
       passthrough_behavior = "WHEN_NO_MATCH"
       response_models      = { "application/json" = "Empty" }
       stage_name           = "prd"
-      url_cors_allow       = "'${module.resources.s3_bucket_website_url}'"
+      url_cors_allow       = local.cloudfront_origin
     },
     "put_bets_put" = {
       resource_id      = module.api_bets_manager.api_resource_ids["put_bets"]
@@ -42,7 +46,7 @@ module "api_resource_put_bets" {
       uri              = module.lambdas_backend_api.invoke_arn["put_bets"]
       response_models  = { "application/json" = "Empty" }
       stage_name       = "prd"
-      url_cors_allow   = "'${module.resources.s3_bucket_website_url}'"
+      url_cors_allow   = local.cloudfront_origin
     }
   }
 }
@@ -62,7 +66,7 @@ module "api_resource_get_secret" {
       passthrough_behavior = "WHEN_NO_MATCH"
       response_models      = { "application/json" = "Empty" }
       stage_name           = "prd"
-      url_cors_allow       = "'${module.resources.s3_bucket_website_url}'"
+      url_cors_allow       = local.cloudfront_origin
     },
     "get_secret_get" = {
       resource_id      = module.api_bets_manager.api_resource_ids["get_secret"]
@@ -72,7 +76,7 @@ module "api_resource_get_secret" {
       uri              = module.lambdas_backend_api.invoke_arn["get_secret"]
       response_models  = { "application/json" = "Empty" }
       stage_name       = "prd"
-      url_cors_allow   = "'${module.resources.s3_bucket_website_url}'"
+      url_cors_allow   = local.cloudfront_origin
     }
   }
 }
@@ -92,7 +96,7 @@ module "api_resource_manage_matches" {
       passthrough_behavior = "WHEN_NO_MATCH"
       response_models      = { "application/json" = "Empty" }
       stage_name           = "prd"
-      url_cors_allow       = "'${module.resources.s3_bucket_website_url}'"
+      url_cors_allow       = local.cloudfront_origin
     },
     "manage_matches_post" = {
       resource_id      = module.api_bets_manager.api_resource_ids["manage_matches"]
@@ -103,7 +107,7 @@ module "api_resource_manage_matches" {
       uri              = module.lambdas_backend_api.invoke_arn["manage_matches"]
       response_models  = { "application/json" = "Empty" }
       stage_name       = "prd"
-      url_cors_allow   = "'${module.resources.s3_bucket_website_url}'"
+      url_cors_allow   = local.cloudfront_origin
     },
     "manage_matches_get" = {
       resource_id      = module.api_bets_manager.api_resource_ids["manage_matches"]
@@ -114,7 +118,7 @@ module "api_resource_manage_matches" {
       uri              = module.lambdas_backend_api.invoke_arn["get_matches"]
       response_models  = { "application/json" = "Empty" }
       stage_name       = "prd"
-      url_cors_allow   = "'${module.resources.s3_bucket_website_url}'"
+      url_cors_allow   = local.cloudfront_origin
     }
   }
 }
@@ -134,7 +138,7 @@ module "api_resource_create_update_results" {
       passthrough_behavior = "WHEN_NO_MATCH"
       response_models      = { "application/json" = "Empty" }
       stage_name           = "prd"
-      url_cors_allow       = "'${module.resources.s3_bucket_website_url}'"
+      url_cors_allow       = local.cloudfront_origin
     },
     "create_matches_football_data_post" = {
       resource_id      = module.api_bets_manager.api_resource_ids["create-matches-football-data"]
@@ -145,7 +149,7 @@ module "api_resource_create_update_results" {
       uri              = module.lambdas_backend_api.invoke_arn["create_matches_for_futbol_data"]
       response_models  = { "application/json" = "Empty" }
       stage_name       = "prd"
-      url_cors_allow   = "'${module.resources.s3_bucket_website_url}'"
+      url_cors_allow   = local.cloudfront_origin
     }
   }
 }
@@ -165,7 +169,7 @@ module "api_resource_update_results" {
       passthrough_behavior = "WHEN_NO_MATCH"
       response_models      = { "application/json" = "Empty" }
       stage_name           = "prd"
-      url_cors_allow       = "'${module.resources.s3_bucket_website_url}'"
+      url_cors_allow       = local.cloudfront_origin
     },
     "update_results_post" = {
       resource_id      = module.api_bets_manager.api_resource_ids["update_results"]
@@ -176,7 +180,7 @@ module "api_resource_update_results" {
       uri              = module.lambdas_backend_api.invoke_arn["update_results"]
       response_models  = { "application/json" = "Empty" }
       stage_name       = "prd"
-      url_cors_allow   = "'${module.resources.s3_bucket_website_url}'"
+      url_cors_allow   = local.cloudfront_origin
     },
     "update_results_get" = {
       resource_id      = module.api_bets_manager.api_resource_ids["update_results"]
@@ -187,7 +191,7 @@ module "api_resource_update_results" {
       uri              = module.lambdas_backend_api.invoke_arn["get_scores"]
       response_models  = { "application/json" = "Empty" }
       stage_name       = "prd"
-      url_cors_allow   = "'${module.resources.s3_bucket_website_url}'"
+      url_cors_allow   = local.cloudfront_origin
     }
   }
 }
