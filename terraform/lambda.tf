@@ -120,6 +120,21 @@ module "lambdas_backend_api" {
       handler     = "manage_champion_config.lambda_handler"
       runtime     = "python3.12"
       environment_variables = {}
+    },
+    set_tournament_champion = {
+      lambda_name = "set_tournament_champion"
+      handler     = "set_tournament_champion.lambda_handler"
+      runtime     = "python3.12"
+      environment_variables = {
+        "champion_table" = module.dynamo_tables_bets_manager.dynamo_table_name["champion_table"]
+        "score_table"    = module.dynamo_tables_bets_manager.dynamo_table_name["score_user_table"]
+      }
+    },
+    get_tournament_champion = {
+      lambda_name = "get_tournament_champion"
+      handler     = "get_tournament_champion.lambda_handler"
+      runtime     = "python3.12"
+      environment_variables = {}
     }
   }
 }
@@ -190,6 +205,16 @@ module "lambda_permission_api" {
     manage_champion_config = {
       lambda_name = module.lambdas_backend_api.lambda_name["manage_champion_config"]
       source_arn  = module.api_resource_champion_config.method_arn["champion_config_post"]
+      principal   = "apigateway.amazonaws.com"
+    },
+    set_tournament_champion = {
+      lambda_name = module.lambdas_backend_api.lambda_name["set_tournament_champion"]
+      source_arn  = module.api_resource_tournament_champion.method_arn["tournament_champion_post"]
+      principal   = "apigateway.amazonaws.com"
+    },
+    get_tournament_champion = {
+      lambda_name = module.lambdas_backend_api.lambda_name["get_tournament_champion"]
+      source_arn  = module.api_resource_tournament_champion.method_arn["tournament_champion_get"]
       principal   = "apigateway.amazonaws.com"
     }
   }

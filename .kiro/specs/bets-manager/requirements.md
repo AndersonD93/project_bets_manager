@@ -59,7 +59,14 @@ Aplicación serverless de apuestas deportivas construida sobre AWS con Terraform
 - **REQ-9.2**: El admin debe poder bloquear/desbloquear la modificación de campeón (update) para todos los usuarios.
 - **REQ-9.3**: Los controles de bloqueo deben estar en el panel de administración.
 
-### REQ-4: Actualización de Resultados (Admin)
+### REQ-10: Campeón Final del Torneo (Admin)
+
+- **REQ-10.1**: El admin debe poder seleccionar el campeón final del torneo desde el mismo dropdown de países del Parameter Store.
+- **REQ-10.2**: Al seleccionar el campeón final, el sistema debe evaluar la tabla `champion_picks` y sumar 15 puntos adicionales a cada usuario cuyo país coincida con el campeón seleccionado.
+- **REQ-10.3**: La tabla `score_user` debe incluir una bandera `champion_bonus_applied` (`true`/`false`) para evitar doble suma.
+- **REQ-10.4**: Si el admin revierte la selección (estado "sin seleccionar"), el sistema debe restar los 15 puntos a los usuarios que los recibieron y poner la bandera en `false`.
+- **REQ-10.5**: El campeón final seleccionado debe almacenarse en SSM Parameter Store para persistencia.
+- **REQ-10.6**: La lógica de recálculo debe estar en una función dentro de `recalculate_score` o en una Lambda dedicada invocada desde el frontend del admin.
 
 - **REQ-4.1**: Un admin debe poder actualizar el resultado real de un partido con `match_id`, `real_result` y `exact_score`.
 - **REQ-4.2**: Al actualizar el resultado, el partido debe marcarse como `FINISHED` en la tabla de partidos.

@@ -25,3 +25,13 @@ resource "aws_ssm_parameter" "champion_update_blocked" {
 
   lifecycle { ignore_changes = [value] }
 }
+
+resource "aws_ssm_parameter" "tournament_champion" {
+  name        = "/bets-manager/champion/tournament-winner"
+  type        = "String"
+  value       = ""
+  description = "Campeón final del torneo seleccionado por el admin (vacío = sin seleccionar)"
+  tags        = { Project = var.project }
+
+  lifecycle { ignore_changes = [value] }
+}

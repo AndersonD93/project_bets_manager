@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { createMatch, getMatches, setMatchStatus } from '../api/matches';
-import { getChampionData, setChampionConfig } from '../api/champion';
+import { getChampionData, setChampionConfig, getTournamentChampion, setTournamentChampion } from '../api/champion';
 import Navbar from '../components/Navbar';
 
 export default function Admin() {
@@ -21,7 +21,15 @@ export default function Admin() {
   const [updateBlocked, setUpdateBlocked] = useState(false);
   const [championMsg, setChampionMsg] = useState('');
   const [championErr, setChampionErr] = useState('');
-  const [savingChampion, setSavingChampion] = useState(false); // match_id being toggled
+  const [savingChampion, setSavingChampion] = useState(false);
+
+  // Tournament champion state
+  const [tournamentCountries, setTournamentCountries] = useState([]);
+  const [currentWinner, setCurrentWinner]             = useState('');
+  const [selectedWinner, setSelectedWinner]           = useState('');
+  const [tournamentMsg, setTournamentMsg]             = useState('');
+  const [tournamentErr, setTournamentErr]             = useState('');
+  const [savingWinner, setSavingWinner]               = useState(false); // match_id being toggled
 
   // Load all non-finished matches (including blocked) for admin
   useEffect(() => {
@@ -38,6 +46,18 @@ export default function Admin() {
       .then((data) => {
         setInsertBlocked(data.insert_blocked || false);
         setUpdateBlocked(data.update_blocked || false);
+      })
+      .catch(() => {});
+  }, [secrets]);
+
+  // Load tournament champion
+  useEffect(() => {
+    if (!secrets?.UrlApiTournamentChampion) return;
+    getTournamentChampion(secrets.UrlApiTournamentChampion, auth.token)
+      .then((data) => {
+        setTournamentCountries(data.countries || []);
+        setCurrentWinner(data.current_winner || '');
+        setSelectedWinner(data.current_winner || '');
       })
       .catch(() => {});
   }, [secrets]);
@@ -207,6 +227,54 @@ export default function Admin() {
               </button>
             </div>
           </div>
+        </div>
+
+        {/* Tournament champion selector */}
+        <div className="card">
+          <h2>🌍 Campeón Final del Torneo</h2>
+          <p style={{ fontSize: 13, color: '#888', marginBottom: 16 }}>
+            Al seleccionar el campeón final, se sumarán <strong>15 puntos</strong> a todos los usuarios que eligieron ese país.
+            Si se revierte la selección, los puntos se restan automáticamente.
+          </p>
+          {tournamentMsg && <p className="success">{tournamentMsg}</p>}
+          {tournamentErr && <p className="error">{tournamentErr}</p>}
+
+          {currentWinner && (
+            <div style={{ textAlign: 'center', padding: '12px 0', marginBottom: 12, background: '#f0fff4', borderRadius: 8 }}>
+              <p style={{ fontSize: 13, color: '#555' }}>Campeón actual:</p>
+              <p style={{ fontSize: '1.4rem', fontWeight: 700 }}>{currentWinner}</p>
+            </div>
+          )}
+
+          <select
+            value={selectedWinner}
+            onChange={(e) => setSelectedWinner(e.target.value)}
+            style={{ marginBottom: 12 }}
+          >
+            <option value="">— Sin seleccionar (revertir) —</option>
+            {tournamentCountries.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+
+          <button
+            className="btn btn-green"
+            disabled={savingWinner || selectedWinner === currentWinner}
+            onClick={async () => {
+              setSavingWinner(true); setTournamentMsg(''); setTournamentErr('');
+              try {
+                const res = await setTournamentChampion(secrets.UrlApiTournamentChampion, auth.token, selectedWinner);
+                setTournamentMsg(`✅ ${res}`);
+                setCurrentWinner(selectedWinner);
+              } catch (e) {
+                setTournamentErr(`❌ ${e.message}`);
+              } finally {
+                setSavingWinner(false);
+              }
+            }}
+          >
+            {savingWinner ? 'Aplicando...' : selectedWinner ? `Confirmar: ${selectedWinner}` : 'Revertir selección'}
+          </button>
         </div>
 
       </div>

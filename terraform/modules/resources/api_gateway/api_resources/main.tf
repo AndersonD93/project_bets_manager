@@ -1,6 +1,6 @@
-resource "aws_api_gateway_request_validator" "request_validator" {
-  for_each                    = var.api_resources
-  name                        = "validator_${each.value.resource_id}_${each.value.http_method}"
+# Single shared validator per module invocation (avoids hitting the 10-validator limit per API)
+resource "aws_api_gateway_request_validator" "shared_validator" {
+  name                        = "validator_${var.api_id}_${md5(jsonencode(keys(var.api_resources)))}"
   rest_api_id                 = var.api_id
   validate_request_body       = true
   validate_request_parameters = true
@@ -13,7 +13,7 @@ resource "aws_api_gateway_method" "api_method" {
   http_method          = each.value.http_method
   authorization        = each.value.authorization
   authorizer_id        = each.value.authorizer_id != null ? each.value.authorizer_id : null
-  request_validator_id = aws_api_gateway_request_validator.request_validator[each.key].id
+  request_validator_id = aws_api_gateway_request_validator.shared_validator.id
 }
 
 resource "aws_api_gateway_integration" "api_integration" {

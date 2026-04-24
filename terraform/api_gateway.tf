@@ -9,7 +9,7 @@ module "api_bets_manager" {
   name_api        = "api_bets_manager_moduls"
   description_api = "api para gestionar peticiones para backends logica de aplicación"
   type_endpoint   = "REGIONAL"
-  path_part_list  = ["put_bets", "get_secret", "manage_matches", "create-matches-football-data", "update_results", "manage_match_status", "get_results", "get_bets", "champion", "champion-config"]
+  path_part_list  = ["put_bets", "get_secret", "manage_matches", "create-matches-football-data", "update_results", "manage_match_status", "get_results", "get_bets", "champion", "champion-config", "tournament-champion"]
 }
 
 resource "aws_api_gateway_authorizer" "cognito_authorizer_module" {
@@ -357,6 +357,48 @@ module "api_resource_champion_config" {
       authorizer_id    = aws_api_gateway_authorizer.cognito_authorizer_module.id
       type_integration = "AWS_PROXY"
       uri              = module.lambdas_backend_api.invoke_arn["manage_champion_config"]
+      response_models  = { "application/json" = "Empty" }
+      stage_name       = "prd"
+      url_cors_allow   = local.cloudfront_origin
+    }
+  }
+}
+
+module "api_resource_tournament_champion" {
+  source               = "./modules/resources/api_gateway/api_resources"
+  api_id               = module.api_bets_manager.api_id
+  api_root_resource_id = module.api_bets_manager.api_root_resource_id
+
+  api_resources = {
+    "tournament_champion_options" = {
+      resource_id          = module.api_bets_manager.api_resource_ids["tournament-champion"]
+      http_method          = "OPTIONS"
+      authorization        = "NONE"
+      type_integration     = "MOCK"
+      request_templates    = { "application/json" = "{\"statusCode\": 200}" }
+      passthrough_behavior = "WHEN_NO_MATCH"
+      response_models      = { "application/json" = "Empty" }
+      stage_name           = "prd"
+      url_cors_allow       = local.cloudfront_origin
+    },
+    "tournament_champion_get" = {
+      resource_id      = module.api_bets_manager.api_resource_ids["tournament-champion"]
+      http_method      = "GET"
+      authorization    = "COGNITO_USER_POOLS"
+      authorizer_id    = aws_api_gateway_authorizer.cognito_authorizer_module.id
+      type_integration = "AWS_PROXY"
+      uri              = module.lambdas_backend_api.invoke_arn["get_tournament_champion"]
+      response_models  = { "application/json" = "Empty" }
+      stage_name       = "prd"
+      url_cors_allow   = local.cloudfront_origin
+    },
+    "tournament_champion_post" = {
+      resource_id      = module.api_bets_manager.api_resource_ids["tournament-champion"]
+      http_method      = "POST"
+      authorization    = "COGNITO_USER_POOLS"
+      authorizer_id    = aws_api_gateway_authorizer.cognito_authorizer_module.id
+      type_integration = "AWS_PROXY"
+      uri              = module.lambdas_backend_api.invoke_arn["set_tournament_champion"]
       response_models  = { "application/json" = "Empty" }
       stage_name       = "prd"
       url_cors_allow   = local.cloudfront_origin
