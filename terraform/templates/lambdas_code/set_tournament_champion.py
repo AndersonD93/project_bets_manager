@@ -4,13 +4,14 @@ from decimal import Decimal
 from botocore.exceptions import ClientError
 import os
 
-dynamodb      = boto3.resource('dynamodb')
-ssm           = boto3.client('ssm')
+dynamodb       = boto3.resource('dynamodb')
+ssm            = boto3.client('ssm')
 champion_table = dynamodb.Table(os.getenv('champion_table'))
 score_table    = dynamodb.Table(os.getenv('score_table'))
 
 BONUS_POINTS   = 15
 SSM_WINNER_KEY = '/bets-manager/champion/tournament-winner'
+_NO_WINNER     = 'NONE'
 
 CORS_HEADERS = {
     "Access-Control-Allow-Origin": "https://d3iqu3owmhprm.cloudfront.net",
@@ -21,15 +22,22 @@ CORS_HEADERS = {
 
 
 def get_current_winner():
-    """Returns current tournament winner from SSM, or empty string if not set."""
+    """Returns current tournament winner from SSM, or empty string if not set or sentinel."""
     try:
-        return ssm.get_parameter(Name=SSM_WINNER_KEY)['Parameter']['Value']
+        val = ssm.get_parameter(Name=SSM_WINNER_KEY)['Parameter']['Value']
+        return '' if val == _NO_WINNER else val
     except Exception:
         return ''
 
 
 def set_winner_ssm(country):
-    ssm.put_parameter(Name=SSM_WINNER_KEY, Value=country, Type='String', Overwrite=True)
+    """Persists winner in SSM. Uses sentinel 'NONE' when unsetting (SSM rejects empty strings)."""
+    ssm.put_parameter(
+        Name=SSM_WINNER_KEY,
+        Value=country if country else _NO_WINNER,
+        Type='String',
+        Overwrite=True
+    )
 
 
 def apply_bonus(country):
@@ -119,8 +127,12 @@ def lambda_handler(event, context):
     if new_winner:
         applied = apply_bonus(new_winner)
 
-    # Persist new winner in SSM
-    set_winner_ssm(new_winner)
+    # Persist new winner in SSM (fix: sentinel 'NONE' evita ValidationException con string vacío)
+    try:
+        set_winner_ssm(new_winner)
+    except Exception as e:
+        return {'statusCode': 500, 'headers': CORS_HEADERS,
+                'body': json.dumps(f'Error persistiendo campeón en SSM: {str(e)}')}
 
     msg = (
         f'Campeón actualizado a "{new_winner}". '

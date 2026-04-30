@@ -1,19 +1,10 @@
-# Single shared validator per module invocation (avoids hitting the 10-validator limit per API)
-resource "aws_api_gateway_request_validator" "shared_validator" {
-  name                        = "validator_${var.api_id}_${md5(jsonencode(keys(var.api_resources)))}"
-  rest_api_id                 = var.api_id
-  validate_request_body       = true
-  validate_request_parameters = true
-}
-
 resource "aws_api_gateway_method" "api_method" {
-  for_each             = var.api_resources
-  rest_api_id          = var.api_id
-  resource_id          = each.value.resource_id
-  http_method          = each.value.http_method
-  authorization        = each.value.authorization
-  authorizer_id        = each.value.authorizer_id != null ? each.value.authorizer_id : null
-  request_validator_id = aws_api_gateway_request_validator.shared_validator.id
+  for_each      = var.api_resources
+  rest_api_id   = var.api_id
+  resource_id   = each.value.resource_id
+  http_method   = each.value.http_method
+  authorization = each.value.authorization
+  authorizer_id = each.value.authorizer_id != null ? each.value.authorizer_id : null
 }
 
 resource "aws_api_gateway_integration" "api_integration" {
@@ -21,7 +12,8 @@ resource "aws_api_gateway_integration" "api_integration" {
   rest_api_id             = var.api_id
   resource_id             = each.value.resource_id
   http_method             = aws_api_gateway_method.api_method[each.key].http_method
-  integration_http_method = each.value.http_method == "OPTIONS" ? each.value.http_method : "POST"
+  # ✅ MOCK no lleva integration_http_method
+  integration_http_method = each.value.type_integration == "MOCK" ? null : "POST"
   type                    = each.value.type_integration
   request_templates       = each.value.request_templates
   passthrough_behavior    = each.value.passthrough_behavior
@@ -40,13 +32,12 @@ resource "aws_api_gateway_method_response" "api_response" {
     "method.response.header.Access-Control-Allow-Headers" = true
   }
   response_models = each.value.response_models
-  depends_on = [
-    aws_api_gateway_integration.api_integration
-  ]
+  depends_on      = [aws_api_gateway_integration.api_integration]
 }
 
+# ✅ Solo para MOCK (OPTIONS) — AWS_PROXY no necesita integration_response
 resource "aws_api_gateway_integration_response" "api_integration_response" {
-  for_each    = var.api_resources
+  for_each    = { for k, v in var.api_resources : k => v if v.type_integration == "MOCK" }
   rest_api_id = var.api_id
   resource_id = each.value.resource_id
   http_method = aws_api_gateway_method.api_method[each.key].http_method
@@ -67,10 +58,7 @@ resource "aws_api_gateway_deployment" "api_deployment_put_bets" {
   for_each    = var.api_resources
   rest_api_id = var.api_id
   stage_name  = each.value.stage_name
-
-  depends_on = [
-    aws_api_gateway_integration.api_integration
-  ]
+  depends_on  = [aws_api_gateway_integration.api_integration]
 }
 
 data "aws_caller_identity" "current" {}

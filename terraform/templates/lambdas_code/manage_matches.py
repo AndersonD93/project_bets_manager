@@ -7,6 +7,13 @@ import os
 dynamodb = boto3.resource('dynamodb')
 matches_table = dynamodb.Table(os.getenv('matches_table'))
 
+CORS_HEADERS = {
+    "Access-Control-Allow-Origin": "https://d3iqu3owmhprm.cloudfront.net",
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization"
+}
+
 
 def lambda_handler(event, context):
     try:
@@ -32,35 +39,20 @@ def lambda_handler(event, context):
         )
         return {
             'statusCode': 200,
-            'headers': {
-                "Access-Control-Allow-Origin": "https://d3iqu3owmhprm.cloudfront.net",
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type, Authorization"
-            },
+            'headers': CORS_HEADERS,
             'body': json.dumps(f'Partido {match_id} creado o actualizado exitosamente.')
         }
     
     except KeyError as e:
         return {
             'statusCode': 400,
-            'headers': {
-                "Access-Control-Allow-Origin": "https://d3iqu3owmhprm.cloudfront.net",
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type, Authorization"
-            },
+            'headers': CORS_HEADERS,
             'body': json.dumps(f"Error: Falta la clave {str(e)} en el cuerpo de la solicitud.")
         }
     
     except ClientError as e:
         return {
             'statusCode': 400,
-            'headers': {
-                "Access-Control-Allow-Origin": "https://d3iqu3owmhprm.cloudfront.net",
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type, Authorization"
-            },
+            'headers': CORS_HEADERS,
             'body': json.dumps(f"Error: {str(e)}")
         }

@@ -29,7 +29,7 @@ resource "aws_ssm_parameter" "champion_update_blocked" {
 resource "aws_ssm_parameter" "tournament_champion" {
   name        = "/bets-manager/champion/tournament-winner"
   type        = "String"
-  value       = ""
+  value       = "TBD"
   description = "Campeón final del torneo seleccionado por el admin (vacío = sin seleccionar)"
   tags        = { Project = var.project }
 

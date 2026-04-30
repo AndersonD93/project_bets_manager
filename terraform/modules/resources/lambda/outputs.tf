@@ -8,6 +8,11 @@ output "lambda_role_arns" {
   value       = { for key, role in aws_iam_role.lambda_role : key => role.arn }
 }
 
+output "lambda_role_name" {
+  description = "El nombre de todos los roles de las funciones Lambda"
+  value       = { for key, role in aws_iam_role.lambda_role : key => role.name }
+}
+
 output "invoke_arn" {
   description = "invoke_arn"
   value       = { for key, lambda in aws_lambda_function.lambda_function : key => lambda.invoke_arn }

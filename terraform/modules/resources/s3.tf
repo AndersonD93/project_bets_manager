@@ -41,3 +41,10 @@ resource "aws_s3_object" "react_build" {
   etag         = filemd5("${local.react_build_dir}/${each.value}")
 }
 
+resource "aws_s3_object" "dashboard_html" {
+  bucket       = aws_s3_bucket.static_site.bucket
+  key          = "html/dashboard.html"
+  source       = "${path.module}/../../templates/html/dashboard.html"
+  content_type = "text/html"
+  etag         = filemd5("${path.module}/../../templates/html/dashboard.html")
+}

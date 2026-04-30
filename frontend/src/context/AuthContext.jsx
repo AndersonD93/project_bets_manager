@@ -5,10 +5,25 @@ import { getSecrets } from '../api/config';
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [auth, setAuth] = useState(null);       // { token, username, group }
-  const [secrets, setSecrets] = useState(null); // API URLs + Cognito config
+  // ✅ Rehidrata auth inmediatamente desde sessionStorage, sin esperar secrets
+  const [auth, setAuth] = useState(() => {
+    const token    = sessionStorage.getItem('idToken');
+    const username = sessionStorage.getItem('username');
+    if (!token || !username) return null;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const group   = (payload['cognito:groups'] ?? [])[0] ?? null;
+      return { token, username, group };
+    } catch {
+      sessionStorage.clear();
+      return null;
+    }
+  });
+
+  const [secrets, setSecrets] = useState(null);
+  // ✅ loading arranca en true solo si no hay sesión previa
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError]     = useState(null);
 
   useEffect(() => {
     getSecrets()
@@ -23,7 +38,7 @@ export function AuthProvider({ children }) {
 
       const pool = new CognitoUserPool({
         UserPoolId: secrets.UserPoolId,
-        ClientId: secrets.ClientId,
+        ClientId:   secrets.ClientId,
       });
 
       const cognitoUser = new CognitoUser({ Username: username, Pool: pool });
@@ -31,12 +46,12 @@ export function AuthProvider({ children }) {
 
       cognitoUser.authenticateUser(authDetails, {
         onSuccess(result) {
-          const idToken = result.getIdToken().getJwtToken();
-          const payload = result.getIdToken().decodePayload();
-          const groups = payload['cognito:groups'] ?? [];
-          const group = groups[0] ?? null;
-          sessionStorage.setItem('idToken', idToken);
-          sessionStorage.setItem('username', payload['cognito:username']);
+          const idToken  = result.getIdToken().getJwtToken();
+          const payload  = result.getIdToken().decodePayload();
+          const groups   = payload['cognito:groups'] ?? [];
+          const group    = groups[0] ?? null;
+          sessionStorage.setItem('idToken',   idToken);
+          sessionStorage.setItem('username',  payload['cognito:username']);
           setAuth({ token: idToken, username: payload['cognito:username'], group });
           resolve(group);
         },
@@ -57,21 +72,7 @@ export function AuthProvider({ children }) {
     setAuth(null);
   }
 
-  // Restore session on reload
-  useEffect(() => {
-    const token = sessionStorage.getItem('idToken');
-    const username = sessionStorage.getItem('username');
-    if (token && username && secrets) {
-      // Decode group from token
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        const group = (payload['cognito:groups'] ?? [])[0] ?? null;
-        setAuth({ token, username, group });
-      } catch {
-        sessionStorage.clear();
-      }
-    }
-  }, [secrets]);
+  // ✅ useEffect de rehidratación eliminado — ya no es necesario
 
   return (
     <AuthContext.Provider value={{ auth, secrets, loading, error, login, logout }}>

@@ -1,14 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
-  const { login, loading, error } = useAuth();
+  const { login, loading, error, auth } = useAuth();
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [err, setErr] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  // ✅ Si ya hay sesión activa, redirige sin mostrar el login
+  useEffect(() => {
+    if (!loading && auth) {
+      auth.group === 'admin' ? navigate('/admin') : navigate('/bets');
+    }
+  }, [auth, loading]);
 
   async function handleSubmit(e) {
     e.preventDefault();

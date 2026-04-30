@@ -15,26 +15,26 @@ resource "aws_iam_policy" "ssm_champion_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "put_champion_ssm" {
-  role       = module.lambdas_backend_api.lambda_role_arns["put_champion"]
+  role       = module.lambdas_backend_api.lambda_role_name["put_champion"]
   policy_arn = aws_iam_policy.ssm_champion_policy.arn
 }
 
 resource "aws_iam_role_policy_attachment" "get_champion_ssm" {
-  role       = module.lambdas_backend_api.lambda_role_arns["get_champion"]
+  role       = module.lambdas_backend_api.lambda_role_name["get_champion"]
   policy_arn = aws_iam_policy.ssm_champion_policy.arn
 }
 
 resource "aws_iam_role_policy_attachment" "manage_champion_config_ssm" {
-  role       = module.lambdas_backend_api.lambda_role_arns["manage_champion_config"]
+  role       = module.lambdas_backend_api.lambda_role_name["manage_champion_config"]
   policy_arn = aws_iam_policy.ssm_champion_policy.arn
 }
 
 resource "aws_iam_role_policy_attachment" "set_tournament_champion_ssm" {
-  role       = module.lambdas_backend_api.lambda_role_arns["set_tournament_champion"]
+  role       = module.lambdas_backend_api.lambda_role_name["set_tournament_champion"]
   policy_arn = aws_iam_policy.ssm_champion_policy.arn
 }
 
 resource "aws_iam_role_policy_attachment" "get_tournament_champion_ssm" {
-  role       = module.lambdas_backend_api.lambda_role_arns["get_tournament_champion"]
+  role       = module.lambdas_backend_api.lambda_role_name["get_tournament_champion"]
   policy_arn = aws_iam_policy.ssm_champion_policy.arn
 }
